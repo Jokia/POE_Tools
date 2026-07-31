@@ -1,0 +1,102 @@
+# 🧭 Path of Exile 異界速通拓荒與高階輔助全能軍火庫 / Endgame Toolkit Portfolio 🪙
+
+<p align="center">
+  <b><a href="#繁體中文說明">📌 繁體中文說明</a></b> | 
+  <b><a href="#english-guide">📌 English User Guide</a></b>
+</p>
+
+---
+
+<a name="繁體中文說明"></a>
+## 🛠️ 核心全能輔助模組清單 (繁體中文)
+
+這是一個專為《流失之路》（Path of Exile）開荒拓荒、進階理財與大倉管理打造的**純前端、零依賴、純本地安全運行**的免登入工具箱。完美復刻 PoE 經典暗黑視覺風格，完美適配 Edge/Chrome 瀏覽器，且自帶 `localStorage` 本地自動存盤暫存功能。
+
+> 🚀 **線上直達個人軍火庫站：** `https://github.io`  
+> *(請将上方連結中的“你的GitHub用戶名”替換為您自己的真實 GitHub ID)*
+
+### 1. 🧭 異界圖鑑速通逃課指南 (`index.html`)
+* **降維打擊：** 開荒初期利用低价买来的高物理 DPS 武器打破等級壓制與命中率限制。
+* **逃課秘籍：** 手把手教你如何利用新賽季的「高階圖合併解鎖機制」，透過打通一張 **T10 稀有黃圖** 一瞬間白嫖十幾點異界天賦點，直接跳過底層開圖的繁瑣折磨期！
+
+### 2. 🪙 28種核心通貨全幣種中英/縮寫速查大典 (`index.html`)
+* **雙語對照：** 完整收录日常交易、品質、插槽以及高阶极品破裂、古靈世界通貨的中英文官方全称。
+* **瞬時過濾：** 支援在搜尋框內直接輸入 `Div`、`C`、`Vaal`、`重鑄` 等拼音、繁簡中文字或官方縮寫，進行秒級動態聯動檢索。
+
+### 3. 💰 43種全幣種賽季通貨身價動態計算器 (`calculator.html`)
+* **雙向連動：** 頂部提供核心匯率（如 1D = 多少 C）的手動網頁修改面板，打字即時動態連動。
+* **自動存盤：** 填入數量自動透過瀏覽器暫存存檔，**即使關閉網頁或重啟瀏覽器，數據也絕對不會遺失**。新賽季開荒資產總額一目了然！
+
+### 4. 🛠️ 自動化雙語詞綴正則過濾器產生器 (`regex.html`)
+* **背包淘金：** 勾選想要的屬性，代碼貼入背包搜尋框，垃圾全黑極品全亮。
+* **紅圖避坑：** 批量勾選雙手猛擊流致命死穴詞綴（物反、元反、無法回復、怪物免暈），一鍵在地圖倉抓出所有危險圖，100% 免疫進圖猝死！完美支援繁體中文與國際服英文正則程式碼切換。
+
+### 5. 🏆 10大頂級外部黑科技工具直達站 (`tools.html`)
+* **絕對直達：** 徹底剔除錯位代碼，超連結百分之百硬編碼鎖死。
+* **工具收錄：** 包含遊戲內估價神器 (PoE Overlay)、傷害模擬器 (PoB社區版)、跑迷宮聖經 (PoE Lab)、全服股市K線图 (PoE Ninja)、C配方自動高亮記憶巨集 (Chaos Recipe Trader)、FilterBlade 線上雲同步、Mapwatch 刷圖效率清算等。
+
+---
+
+## 🔒 隱私與安全性聲明
+
+* **零記憶體讀取：** 本項目所有工具均基於純前端 JavaScript 開發，不讀取、不侵入您的遊戲記憶體，100% 毫同封號風險。
+* **零帳戶隱私：** 本站不要求您提供任何遊戲 Session ID 或帳號密碼。所有的通貨數量和匯率存盤均保存在您自己的電腦本地（Browser LocalStorage），伺服器絕不網路上傳或記錄您的任何資產數據。
+
+---
+
+## 📅 版本維護日誌
+* **當前賽季：** 完美更新並適配最新 **3.29 “萬火之咒 (Curse of the Allflame)” 賽季** 核心開荒規則與最新合併解鎖權重！
+
+---
+<br>
+<p align="right"><b><a href="#🧭-path-of-exile-異界速通拓荒與高階輔助全能軍火庫--endgame-toolkit-portfolio-">⬆️ 返回頂部 / Back to Top</a></b></p>
+<br>
+
+---
+
+<a name="english-guide"></a>
+## 🛠️ Core Features Checklist (English)
+
+This portfolio is a **pure client-side, zero-dependency, and local-secure** toolkit designed for Path of Exile league-starting, net worth tracking, and stash management. Replicating the classic PoE dark theme, it perfectly accommodates Edge/Chrome browsers with localized automatic `localhost` caching persistence.
+
+> 🚀 **Live Deployment Website:** `https://github.io`  
+> *(Please replace "你的GitHub用戶名" with your actual GitHub username)*
+
+### 1. 🧭 Atlas Progression Cheese Guide (`index.html`)
+* **League Start Strategy:** Learn how to abuse the Atlas progression catch-up mechanic. By completing a single **Rare T10 Map**, you instantly unlock bonus objectives for all lower tiers, skipping the tedious low-tier grind entirely!
+* **Mechanic Breakdown:** Leverages high-end flat physical damage scaling to override level penalties and accuracy caps seamlessly during early tiers.
+
+### 2. Complete Currency Quick Reference (`index.html`)
+* **Bilingual Index:** Comprehensive database covering standard trading, socketing, quality-enhancing, and high-tier Fractured/Eldritch world currencies.
+* **Instant Filtering:** Type keywords like `Div`, `C`, `Vaal`, or `Scour` in the search box to fetch exact linguistic translations and abbreviations in real-time.
+
+### 3. League Net Worth Tracker (`calculator.html`)
+* **Dynamic Recalculation:** Adjust core currency ratios (e.g., 1 Divine = X Chaos) dynamically via top input bars with real-time recalculation.
+* **Caching Persistence:** Input your stock quantities; all inputs are cached locally via your browser, **ensuring zero data loss upon tab closures or browser reboots**.
+
+### 4. Bilingual Stash & Map Mod Regex Generator (`regex.html`)
+* **Inventory Sorting:** Select gear prefixes/suffixes to mass-filter item bases inside your inventory. Glow the good bases, hide the junk.
+* **Map Pre-Screening:** Check killer brick mods (e.g., Phys/Ele Reflect, No Regen, Monsters Cannot Be Stunned) to instantly isolate fatal maps in your Map Stash, 100% avoiding accidental XP losses! Seamlessly toggles between Traditional Chinese and official English Regex strings.
+
+### 5. 10 Endgame External Utilities Direct Hub (`tools.html`)
+* **Hardcoded Links:** Zero analytical mapping bugs; all URLs are hardcoded straight to deep-level setup download directories. 
+* **Database Catalog:** Quick jump to crucial third-party meta applications including PoE Overlay, Path of Building (Community Edition), PoE Lab, PoE Ninja, Chaos Recipe Trader, FilterBlade Cloud Sync, and Mapwatch efficiency monitors.
+
+---
+
+## 🔒 Privacy & Security Terms
+
+* **No Memory Intrusions:** All mini-tools are strictly built on client-side JavaScript. They never hook into or scan game memory variables, maintaining a 100% zero-ban safety profile.
+* **No API Session Tokens Required:** We never demand your official POESESSID or account passwords. All calculated inventories and custom ratios remain locked safely within your own browser caching ecosystem (LocalStorage). No data is ever transmitted or uploaded.
+
+---
+
+## 📅 Maintenance Logs
+* **Active Version:** Fully calibrated and optimized for the current **Path of Exile 3.29 Curse of the Allflame League** mechanics and progression catch-up rulesets!
+
+---
+
+*Good luck on your next league launch! May your Atlas stay connected and a Mirror of Kalandra drop for you soon! ⚔本地*
+
+<br>
+<p align="right"><b><a href="#🧭-path-of-exile-異界速通拓荒與高階輔助全能軍火庫--endgame-toolkit-portfolio-">⬆️ 返回頂部 / Back to Top</a></b></p>
