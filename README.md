@@ -64,8 +64,7 @@
 
 This portfolio is a **pure client-side, zero-dependency, and local-secure** toolkit designed for Path of Exile league-starting, net worth tracking, and stash management. Replicating the classic PoE dark theme, it perfectly accommodates Edge/Chrome browsers with localized automatic `localhost` caching persistence.
 
-> 🚀 **Live Deployment Website:** `https://github.io`  
-> *(Please replace "你的GitHub用戶名" with your actual GitHub username)*
+> 🚀 **Live Deployment Website:** `https://github.io/Jokia/POE_Tools`  
 
 ### 1. 🧭 Atlas Progression Cheese Guide (`index.html`)
 * **League Start Strategy:** Learn how to abuse the Atlas progression catch-up mechanic. By completing a single **Rare T10 Map**, you instantly unlock bonus objectives for all lower tiers, skipping the tedious low-tier grind entirely!
