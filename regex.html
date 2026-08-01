@@ -2,6 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
+	<script src="nav.js"></script>
     <title>PoE 自動化詞綴正則過濾器</title>
     <style>
         body { background:#0d0d0d; color:#d1d1d1; font-family:sans-serif; padding:15px; font-size:12px; }
@@ -29,6 +30,7 @@
 </head>
 <body>
 <div class="box">
+	<div id="global-nav"></div>
     <div class="bar">
         <div style="display:flex;align-items:center;"><div class="css-coin"></div><h1 id="ui_title">PoE 自動化詞綴正則過濾器</h1></div>
         <div class="btn-group">
@@ -38,9 +40,7 @@
         </div>
     </div>
 
-    <!-- 💡 【第二步】需要填入的說明書空殼容器 -->
     <div id="gPnl" class="g-panel">
-        <!-- 請把第二步的長文本完整複製貼上在這裡 -->
 		<h3>💡 核心機制：為什麼需要這個工具？</h3>
         <p>在《流放之路》中，無論是遊戲裡的倉庫搜尋框，還是官方市集網頁，都支援強大的<b>正規表示式</b>語法（即用符號 <code>|</code> 連結多個關鍵詞）。本工具可以將你勾選的詞綴自動提煉成一串標準的遊戲底層英文/中文密文，幫您在海量雜物裡瞬間撈出神裝，或直接排除會讓你翻車猝死的危險紅圖。</p>
 

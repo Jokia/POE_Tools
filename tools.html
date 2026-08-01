@@ -2,6 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
+	<script src="nav.js"></script>
     <title>PoE 10 Advanced Toolkits Dashboard (Bilingual)</title>
     <style>
         body { background:#0d0d0d; color:#d1d1d1; font-family:sans-serif; padding:15px; font-size:12px; }
@@ -32,6 +33,7 @@
 </head>
 <body>
 <div class="box">
+	<div id="global-nav"></div>
     <div class="bar">
         <div style="display:flex;align-items:center;"><div class="css-coin"></div><h1 id="ui_title">PoE 高階外部輔助工具箱</h1></div>
         <div class="btn-group">
@@ -53,7 +55,6 @@ const uiText = {
     en: { t: "Path of Exile: 10 Advanced External Core Toolkits Portfolio", exp: "📜 Expand All Manuals", col: "🔒 Collapse All Cards", core: "Baseline", adv: "Endgame", dir: "🔗 Official Link: " }
 };
 
-// 💡【第二步】請把第二步全繁體化的 db 數據矩陣完整複製粘貼在下方：
 const db = [
     {
         id: "overlay", isAdv: false, url_name: "PoE Overlay Official Github Releases Hub", url: "https://github.com/PoE-Overlay-Community/PoE-Overlay-Community-Fork",
