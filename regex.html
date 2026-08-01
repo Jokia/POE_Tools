@@ -2,150 +2,303 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-	<script src="nav.js"></script>
-    <title>PoE 自動化詞綴正則過濾器</title>
+    <script src="nav.js"></script>
+    <title id="page_title">PoE 自動化詞綴正則過濾器</title>
     <style>
         body { background:#0d0d0d; color:#d1d1d1; font-family:sans-serif; padding:15px; font-size:12px; }
-        .box { max-width:850px; margin:0 auto; background:#141414; padding:20px; border:1px solid #222; border-radius:4px; }
-        .bar { display: flex; justify-content: space-between; align-items: center; border-bottom:1px solid #222; padding-bottom:10px; margin-bottom: 15px; }
-        h1 { color:#e5c158; font-size:18px; margin: 0; }
-        .css-coin { width: 16px; height: 16px; background: linear-gradient(135deg, #ffe066 0%, #e5c158 50%, #b38f00 100%); border-radius: 50%; margin-right: 8px; border: 1px solid #ffe066; position: relative; }
+        .box { max-width:850px; margin:0 auto; background:#141414; padding:20px; border:1px solid #222; border-radius:4px; position: relative; }
+        
+        /* 標題欄容器（整合多語言與說明按鈕） */
+        .bar { display: flex; justify-content: space-between; align-items: center; border-bottom:1px solid #222; padding-bottom:10px; margin-bottom: 15px; margin-top: 15px; }
+        h1 { color:#e5c158; font-size:18px; margin: 0; flex-grow: 1; text-align: left; }
+        .css-coin { width: 16px; height: 16px; background: linear-gradient(135deg, #ffe066 0%, #e5c158 50%, #b38f00 100%); border-radius: 50%; margin-right: 8px; border: 1px solid #ffe066; position: relative; flex-shrink: 0; }
         .css-coin::after { content: 'f'; position: absolute; font-size: 10px; font-weight: bold; color: #4d3d00; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-        .btn-group { display: flex; gap: 8px; }
-        .t-btn { padding: 4px 12px; background: #222; border: 1px solid #444; color: #fff; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 11px; }
-        .act { background: #e5c158; color: #111; border-color: #ffe066; }
+        
+        /* 按鈕群組 */
+        .btn-group { display: flex; gap: 8px; flex-shrink: 0; }
+        .t-btn { padding: 4px 12px; background: #111; border: 1px solid #2a2a2a; color: #888; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 11px; transition: all 0.2s; }
+        .t-btn:hover { color: #ffe066; border-color: #ffe066; }
+        .t-btn.act { color: #e5c158; background: #262111; border-color: #e5c158; box-shadow: 0 0 4px rgba(229, 193, 88, 0.3); }
+        
+        /* 說明面板樣式 */
         .g-panel { display: none; background: #1a1a1a; border: 1px solid #333; padding: 15px; margin-bottom: 15px; border-radius: 4px; line-height: 1.7; color:#c5c5c5; }
-        .g-panel h3 { color: #e5c158; margin-top: 12px; margin-bottom: 6px; font-size: 13px; border-bottom: 1px solid #333; padding-bottom: 3px; }
+        .g-panel h3 { color: #e5c158; margin-top: 0; margin-bottom: 8px; font-size: 13px; border-bottom: 1px solid #333; padding-bottom: 3px; }
         .g-panel p { margin: 0 0 8px 0; }
         .g-panel code { background: #000; color: #ff7b72; padding: 1px 4px; font-family: monospace; border-radius: 3px; }
+        
+        /* 生成結果面板 */
         .panel { background: #1c1303; border: 1px solid #e5c158; padding: 12px; margin-bottom: 15px; border-radius: 4px; text-align: center; }
         .out { width: 100%; padding: 8px; background: #090909; border: 1px solid #333; font-family: monospace; font-size: 13px; font-weight: bold; border-radius: 3px; box-sizing: border-box; color: #e5c158; text-align: center; }
-        .c-btn { display: block; width: 140px; margin: 8px auto 0 auto; padding: 5px; background: #2c662d; border: 1px solid #3e8e41; color: #fff; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 11px; }
+        .c-btn { display: block; width: 160px; margin: 8px auto 0 auto; padding: 6px; background: #2c662d; border: 1px solid #3e8e41; color: #fff; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 11px; transition: background 0.2s; }
+        .c-btn:hover { background: #3e8e41; }
+        
+        /* 區塊標題與網格 */
         .sec { color: #e5c158; font-weight: bold; margin: 15px 0 8px 0; font-size: 13px; border-left: 3px solid #e5c158; padding-left: 6px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; background: #1a1a1a; padding: 10px; border-radius: 4px; border: 1px solid #2d2d2d; margin-bottom:15px; }
-        .item { display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 5px 8px; border-radius: 3px; background: #111; border: 1px solid #222; }
-        .item:hover { background: #222; }
-        .clr-btn { display: block; width: 90px; margin: 15px auto 0 auto; padding: 6px; background: #311; border: 1px solid #522; color: #f66; cursor: pointer; font-weight: bold; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; background: #1a1a1a; padding: 10px; border-radius: 4px; border: 1px solid #2d2d2d; margin-bottom:15px; }
+        .item { display: flex; align-items: center; justify-content: space-between; cursor: pointer; padding: 6px 10px; border-radius: 3px; background: #111; border: 1px solid #222; user-select: none; }
+        .item:hover { background: #1e1e1e; border-color: #444; }
+        .item input { cursor: pointer; margin-left: 10px; }
+        
+        .clr-btn { display: block; width: 100px; margin: 15px auto 0 auto; padding: 6px; background: #311; border: 1px solid #522; color: #f66; cursor: pointer; font-weight: bold; border-radius: 3px; transition: background 0.2s; }
+        .clr-btn:hover { background: #522; }
     </style>
 </head>
 <body>
 <div class="box">
-	<div id="global-nav"></div>
+    <!-- 全局導航欄 -->
+    <div id="global-nav"></div>
+    
     <div class="bar">
         <div style="display:flex;align-items:center;"><div class="css-coin"></div><h1 id="ui_title">PoE 自動化詞綴正則過濾器</h1></div>
         <div class="btn-group">
-            <button class="t-btn" onclick="tglG()">💡 <span id="ui_hb">展開詳細使用說明</span></button>
-            <button id="b_zh" class="t-btn act" onclick="setL('zh')">繁體中文</button>
+            <button class="t-btn" id="ui_hb_btn" onclick="tglG()">💡 <span id="ui_hb">展開詳細使用說明</span></button>
+            <button id="b_zh" class="t-btn" onclick="setL('zh')">繁體中文</button>
             <button id="b_en" class="t-btn" onclick="setL('en')">English</button>
         </div>
     </div>
 
-    <div id="gPnl" class="g-panel">
-		<h3>💡 核心機制：為什麼需要這個工具？</h3>
-        <p>在《流放之路》中，無論是遊戲裡的倉庫搜尋框，還是官方市集網頁，都支援強大的<b>正規表示式</b>語法（即用符號 <code>|</code> 連結多個關鍵詞）。本工具可以將你勾選的詞綴自動提煉成一串標準的遊戲底層英文/中文密文，幫您在海量雜物裡瞬間撈出神裝，或直接排除會讓你翻車猝死的危險紅圖。</p>
-
-        <h3>🔥 場景一：背包與大倉庫 5秒鐘光速挑選極品暗金/稀有黃色裝備</h3>
-        <p><b>1. 操作步驟：</b>在下方勾選你最急需的裝備詞綴（例如：<code>最大生命</code> 和 <code>全元素抗性</code> ）。</p>
-        <p><b>2. 複製密文：</b>點選面板中央的【一鍵複製過濾程式碼】。</p>
-        <p><b>3. 遊戲實戰：</b>回到遊戲內，開啟你塞滿髒東西的背包（或大倉庫頁）。用滑鼠點進底部的輸入框，直接按下鍵盤 <code>Ctrl + V</code> 將密文貼進去。</p>
-        <p><b>4. 震撼視覺：</b>全屏的所有垃圾裝備、藥劑在一瞬間全部變黑隱形，<b>只有同時帶著最大生命或全抗的高價值極品裝備會亮著</b>。你直接滑鼠點幾下把好東西留下來，剩下的垃圾直接無腦一鍵賣商店，清理背包手速快上百倍！</p>
-
-        <h3>🛑 場景二：紅圖刷圖大避坑 —— 批次高亮排查“機制死穴”危險圖（開荒財富密碼）</h3>
-        <p>當你玩酋長戰吼猛擊流，或者進入 T11+ 的紅色異界地圖階段時，某些地圖詞綴對你來說進去就是送經驗、直接廢掉你的流派構築。你可以利用本工具在打圖前進行全自動化安全排查：</p>
-        <p><b>1. 勾選死穴：</b>在下方的紅色字區域，勾選你的流派死穴。例如猛擊流必選的：<code>反射物理傷害 (物反)</code>、<code>反射元素傷害 (元反)</code>、<code>玩家無法回覆生命/魔力</code>、以及極其噁心的 <code>怪物無法被眩暈</code>。</p>
-        <p><b>2. 複製去篩圖：</b>複製生成的程式碼，前往你的異界地圖大倉庫頁。直接在頂部的搜尋框中 <code>Ctrl + V</code> 貼上。</p>
-        <p><b>3. 排查完畢：</b>在你攢的幾十張地圖裡，<b>所有會讓你翻車、暴斃、或者噁心人的危險地圖會瞬間全部高亮發光</b>！你直接把這些亮起來的危險圖抓出來，用重鑄加點金重新洗練詞綴，或者是直接打包低價賣給其他能打這些詞綴的流派，剩下沒亮的圖就可以百分之百放心進去閉著眼睛開刷，再也不會莫名其妙掉經驗！</p>
-
-        <h3>🌐 國際服英文版客戶端切換指南</h3>
-        <p>如果你是在玩國際服（英文版客戶端），請在右上角點選切換為 <b>English (國際服程式碼)</b>。此時下方所有的詞綴名字依然是中文，但最上面輸出框裡生成的程式碼，會<b>百分之百自動轉化為嚴格適配國際服英文版客戶端底層的原生英文正則</b>！無縫支援你在國際服進行倉庫過濾和市集（://pathofexile.com）的高階大宗掃貨！</p>
-    </div>
+    <!-- 說明區塊 -->
+    <div id="gPnl" class="g-panel"></div>
     
+    <!-- 程式碼輸出區塊 -->
     <div class="panel">
         <div id="ui_ot" style="color:#e5c158; font-weight:bold; margin-bottom:5px;">📋 遊戲內搜尋框專用過濾程式碼 (即時生成) 📋</div>
-        <input type="text" id="res" class="out" readonly value='""' onclick="this.select()">
+        <input type="text" id="res" class="out" readonly value="" onclick="this.select()">
         <button id="ui_cb" class="c-btn" onclick="cp()">一鍵複製過濾程式碼</button>
     </div>
+    
     <div id="ui_s1" class="sec">🔍 裝備/防具/首飾 核心極品詞綴篩選</div>
     <div class="grid" id="gGrd"></div>
+    
     <div id="ui_s2" class="sec">🛑 異界紅圖“避坑/猝死詞綴”高亮篩選</div>
     <div class="grid" id="mGrd"></div>
+    
     <button id="ui_cl" class="clr-btn" onclick="cls()">全部取消</button>
 </div>
 <script>
 let lang = localStorage.getItem('p_r_l') || 'zh';
+
 const text = {
-    zh: { t: "PoE 詞綴正則過濾器", ot: "📋 遊戲內/倉庫搜尋框專用過濾程式碼 📋", cb: "一鍵複製過濾程式碼", s1: "🔍 裝備/防具/首飾 核心極品詞綴篩選", s2: "🛑 異界紅圖“避坑/猝死詞綴”高亮篩選 (查出直接重洗/瓦掉)", cl: "全部取消", hb: "展開詳細使用說明", cp: "程式碼已成功複製到剪貼簿！" },
-    en: { t: "PoE Regex Filter Generator", ot: "📋 In-Game / Stash Search Code (Real-Time) 📋", cb: "Copy Filter Code", s1: "🔍 Armor & Accessories Core Mod Selection", s2: "🛑 Dangerous Map Mod Highlights", cl: "Clear All", hb: "展開詳細使用說明", cp: "Regex code successfully copied!" }
+    zh: { 
+        t: "PoE 詞綴正則過濾器", 
+        ot: "📋 遊戲內/倉庫搜尋框專用過濾程式碼 📋", 
+        cb: "一鍵複製過濾程式碼", 
+        s1: "🔍 裝備/防具/首飾 核心極品詞綴篩選", 
+        s2: "🛑 異界紅圖“避坑/猝死詞綴”高亮篩選 (查出直接重洗/瓦掉)", 
+        cl: "全部取消", 
+        hb_show: "展開詳細使用說明",
+        hb_hide: "摺疊詳細使用說明",
+        cp: "程式碼已成功複製到剪貼簿！可以去遊戲內直接 Ctrl + V 貼上。",
+        helpHtml: `
+            <h3>💡 核心機制：為什麼需要這個工具？</h3>
+            <p>在《流放之路》中，無論是遊戲裡的倉庫搜尋框，還是官方市集網頁，都支援強大的<b>正規表示式</b>語法（即用符號 <code>|</code> 連結多個關鍵詞）。本工具可以將你勾選的詞綴自動提煉成一串標準的遊戲底層英文/中文密文，幫您在海量雜物裡瞬間撈出神裝，或直接排除會讓你翻車猝死的危險紅圖。</p>
+
+            <h3>🔥 場景一：背包與大倉庫 5秒鐘光速挑選極品暗金/稀有黃色裝備</h3>
+            <p><b>1. 操作步驟：</b>在下方勾選你最急需的裝備詞綴（例如：<code>最大生命</code> 和 <code>全元素抗性</code> ）。</p>
+            <p><b>2. 複製密文：</b>點選面板中央的【一鍵複製過濾程式碼】。</p>
+            <p><b>3. 遊戲實戰：</b>回到遊戲內，開啟你塞滿髒東西的背包（或大倉庫頁）。用滑鼠點進底部的輸入框，直接按下鍵盤 <code>Ctrl + V</code> 將密文貼進去。</p>
+            <p><b>4. 震撼視覺：</b>全屏的所有垃圾裝備、藥劑在一瞬間全部變黑隱形，<b>只有同時帶著最大生命或全抗的高價值極品裝備會亮著</b>。你直接滑鼠點幾下把好東西留下來，剩下的垃圾直接無腦一鍵賣商店，清理背包手速快上百倍！</p>
+
+            <h3>🛑 場景二：紅圖刷圖大避坑 —— 批次高亮排查“機制死穴”危險圖（開荒財富密碼）</h3>
+            <p>當你玩酋長戰吼猛擊流，或者進入 T11+ 的紅色異界地圖階段時，某些地圖詞綴對你來說進去就是送經驗、直接廢掉你的流派構築。你可以利用本工具在打圖前進行全自動化安全排查：</p>
+            <p><b>1. 勾選死穴：</b>在下方的紅色字區域，勾選你的流派死穴。例如猛擊流必選的：<code>反射物理傷害 (物反)</code>、<code>反射元素傷害 (元反)</code>、<code>玩家無法回覆生命/魔力</code>、以及極其噁心的 <code>怪物無法被眩暈</code>。</p>
+            <p><b>2. 複製去篩圖：</b>複製生成的程式碼，前往你的異界地圖大倉庫頁。直接在頂部的搜尋框中 <code>Ctrl + V</code> 貼上。</p>
+            <p><b>3. 排查完畢：</b>在你攢的幾十張地圖裡，<b>所有會讓你翻車、暴斃、或者噁心人的危險地圖會瞬間全部高亮發光</b>！你直接把這些亮起來的危險圖抓出来，用重鑄加點金重新洗練詞綴，或者是直接打包低價賣給其他能打這些詞綴的流派，剩下沒亮的圖就可以百分之百放心進去閉著眼睛開刷，再也不會莫名其妙掉經驗！</p>
+
+            <h3>🌐 國際服英文版客戶端切換指南</h3>
+            <p>如果你是在玩國際服（英文版客戶端），請在右上角點選切換為 <b>English (國際服程式碼)</b>。此時下方所有的詞綴名字依然是中文，但最上面輸出框裡生成的程式碼，會<b>百分之百自動轉化為嚴格適配國際服英文版客戶端底層的原生英文正則</b>！無縫支援你在國際服進行倉庫過濾和市集（pathofexile.com）的高階大宗掃貨！</p>
+        `
+    },
+    en: { 
+        t: "PoE Regex Mod Filter Generator", 
+        ot: "📋 In-Game / Stash Search Code (Real-Time) 📋", 
+        cb: "Copy Filter Code", 
+        s1: "🔍 Armor & Accessories Core Mod Selection", 
+        s2: "🛑 Dangerous Map Mod Highlights (Highlight to reroll)", 
+        cl: "Clear All", 
+        hb_show: "Show Usage Guide",
+        hb_hide: "Hide Usage Guide",
+        cp: "Regex code successfully copied! Ready to paste Ctrl+V in game.",
+        helpHtml: `
+            <h3>💡 Core Mechanics: Why use this tool?</h3>
+            <p>In Path of Exile, both the in-game stash tab search and official trade site support powerful <b>Regular Expression (Regex)</b> syntax (using the <code>|</code> pipe character to connect multiple keywords). This tool extracts your checked mods into a game-compatible string, helping you pinpoint god-tier items from piles of loot or exclude dangerous maps that ruin your character.</p>
+
+            <h3>🔥 Scenario 1: Bag & Stash - Filter Godly Items in 5 Seconds</h3>
+            <p><b>1. Select Mods:</b> Check your targeted gear mods below (e.g., <code>Maximum Life</code> and <code>Total Resistances</code>).</p>
+            <p><b>2. Copy String:</b> Click the central button 【Copy Filter Code】.</p>
+            <p><b>3. In-Game Execution:</b> Open your messy inventory or stash page, click the bottom search box, and hit <code>Ctrl + V</code>.</p>
+            <p><b>4. Visual Feedback:</b> All junk items/flasks will instantly fade away, leaving <b>only items carrying your selected mods glowing</b>. Pick the good ones and dump the rest to vendors instantly!</p>
+
+            <h3>🛑 Scenario 2: Map Rolling - Reroll Lethal Map Bricks Efficiently</h3>
+            <p>When entering T11+ red maps, certain modifiers can be lethal depending on your build. Reroll safely using these steps:</p>
+            <p><b>1. Select Bricks:</b> Check lethal map mods under the red section, such as <code>Reflect Physical Damage</code>, <code>Reflect Elemental Damage</code>, or <code>Cannot Regenerate</code>.</p>
+            <p><b>2. Paste into Stash:</b> Copy the generated code, go to your Map Stash Tab, and paste it into the search box.</p>
+            <p><b>3. Identify & Reroll:</b> Within your map pool, <b>all bricked or dangerous maps will instantly highlight</b>! Pull them out to scour/alc or roll over them with chaos, and run the unhighlighted ones with 100% peace of mind.</p>
+
+            <h3>🌐 International Server Client Guide</h3>
+            <p>If you are playing on the international server with an English client, click <b>English</b> at the top right. The interface labels will stay accessible, but the top output string <b>will automatically convert into precise English client regex strings</b>, natively supporting stash filtering and bulk market shopping!</p>
+        `
+    }
 };
+
+// 滿血版核心數據庫：[ID, 中文顯示名, 英文顯示名, 中文正則, 英文正則, 類型(0裝備/1地圖)]
 const db = [
-    ["g1","最大生命","Maximum Life","生命","maximum life",0],
-    ["g2","全元素抗性","Total Resistances","總抗|全抗","to all elemental resistances",0],
-    ["g3","火焰抗性","Fire Resistance","火","fire resistance",0],
-    ["g4","冰霜抗性","Cold Resistance","冰","cold resistance",0],
-    ["g5","閃電抗性","Lightning Resistance","閃電","lightning resistance",0],
-    ["g6","混沌抗性","Chaos Resistance","混沌.*抗性","chaos resistance",0],
-    ["g7","攻擊速度","Attack Speed","攻擊速度","attack speed",0],
-    ["g8","增加物理傷害","Increased Phys Damage","增加物理傷害","increased physical damage",0],
-    ["g9","附加物理點傷","Adds Physical Damage","攻擊附加.*物理傷害","adds.*physical damage to attacks",0],
-    ["g10","暴擊機率","Critical Strike Chance","暴擊機率","critical strike chance",0],
-    ["g11","暴擊傷害","Critical Strike Multi","暴擊傷害","critical strike multiplier",0],
-    ["g12","力量屬性","Strength","力量","strength",0],
-    ["g13","敏捷屬性","Dexterity","敏捷","dexterity",0],
-    ["g14","智慧屬性","Intelligence","智慧","intelligence",0],
-    ["m1","玩家無法回覆生命/魔力","Players cannot Regenerate","無法回覆","cannot regenerate",1],
-    ["m2","玩家無法偷取生命/魔力","Players cannot Leech","無法偷取","cannot leech",1],
-    ["m3","反射元素傷害 (元反)","Reflects Elemental Damage","反射.*元素","reflects.*elemental damage",1],
-    ["m4","反射物理傷害 (物反)","Reflects Physical Damage","反射.*物理","reflects.*physical damage",1],
-    ["m5","降低玩家最大抗性","-% to maximum Resistances","最大抗性","maximum player resistances",1],
-    ["m6","無法獲得光環效果","Players have no Aura effect","無法獲得光環","have no aura effect",1],
-    ["m7","玩家受到脆弱/時鏈","Players are cursed with Vuln","這時空鎖鏈|受到時空|詛咒","cursed with",1],
-    ["m8","怪物無法被眩暈(死穴)","Monsters cannot be Stunned","無法被眩暈|無法受到眩暈","monsters cannot be stunned",1],
-    ["m9","怪群附加額外元素傷害","Monsters gain Extra Ele","附加.*額外","gain.*as extra elemental damage",1]
+    ["g1","最大生命","Maximum Life","型生","aximum life",0],
+    ["g2","全元素抗性","Total Resistances","各類元素|全抗","o all elemental resistances",0],
+    ["g3","火燄抗性","Fire Resistance","火耐","ire resistance",0],
+    ["g4","冰冷抗性","Cold Resistance","冰耐","old resistance",0],
+    ["g5","閃電抗性","Lightning Resistance","電耐","ightning resistance",0],
+    ["g6","混沌抗性","Chaos Resistance","混沌","haos resistance",0],
+    ["g7","增加暴擊率","Critical Strike Chance","暴擊率","iticial strike chance",0],
+    ["g8","增加暴擊傷害加成","Critical Multiplier","暴擊傷害","iticial strike multiplier",0],
+    ["g9","增加攻擊/施法速度","Attack / Cast Speed","速度","speed",0],
+    ["g10","法術傷害","Spell Damage","法術傷害","spell damage",0],
+    ["g11","物理傷害","Physical Damage","物理傷害","physical damage",0],
+    ["g12","元素傷害","Elemental Damage","元素傷害","elemental damage",0],
+    ["g13","持續傷害加成","Damage over Time Multiplier","持續傷害","over time multiplier",0],
+    ["g14","增加物品掉落數量 (数量度)","Item Quantity","物品掉落數量","tem quantity",0],
+    ["g15","增加物品掉落稀有度 (稀有度)","Item Rarity","物品掉落稀有度","tem rarity",0],
+
+    ["m1","元素反射 (元反)","Reflect Elemental Damage","元反|元素傷害","eflect.*elemental",1],
+    ["m2","物理反射 (物反)","Reflect Physical Damage","物反|物理傷害","eflect.*physical",1],
+    ["m3","無法回復生命/魔力","Cannot Regenerate","無法回復","cannot regenerate",1],
+    ["m4","回復速度降低 (降回復)","Reduced Recovery Rate","降低.*回復","reduced.*recovery",1],
+    ["m5","無法偷取生命/魔力","Cannot Leech","無法偷取","cannot leech",1],
+    ["m6","時空鎖鏈詛咒","Temporal Chains","時空鎖鏈","temporal chains",1],
+    ["m7","怪物具有额外闪避/无法被闪避","Cannot be Evaded / Dodge","無法被閃避|闪避","cannot be evaded",1],
+    ["m8","降低玩家最大抗性 (+Max抗)","Minus Max Resistances","降低.*最大元素抗性","aximum resistances",1],
+    ["m9","怪物造成额外随机元素伤害 (额外增伤)","Gain Extra Gain","額外傷害","as extra",1],
+    ["m10","玩家无法造成暴击","No Critical Strikes","無法造成暴擊","cannot inflict critical",1]
 ];
-document.getElementById('gGrd').innerHTML = db.filter(x=>x[5]==0).map(x=>`<label class="item"><div><span id="n_${x[0]}" style="color:#fff;font-weight:bold;font-size:11px;">${x[1]}</span><br><span style="color:#666;font-style:italic;font-size:10px;">${x[2]}</span></div><input type="checkbox" id="${x[0]}" onchange="run()" data-zh="${x[3]}" data-en="${x[4]}"></label>`).join('');
-document.getElementById('mGrd').innerHTML = db.filter(x=>x[5]==1).map(x=>`<label class="item"><div><span id="n_${x[0]}" style="color:#ff6666;font-weight:bold;font-size:11px;">${x[1]}</span><br><span style="color:#666;font-style:italic;font-size:10px;">${x[2]}</span></div><input type="checkbox" id="${x[0]}" onchange="run()" data-zh="${x[3]}" data-en="${x[4]}"></label>`).join('');
+
+// 動態渲染 HTML 網格結構 (標準 CSS 標籤關聯，無衝突)
+function renderGrid() {
+    document.getElementById('gGrd').innerHTML = db.filter(x => x[5] === 0).map(x => `
+        <label class="item" for="${x[0]}">
+            <div>
+                <span id="n_${x[0]}" style="color:#fff;font-weight:bold;font-size:11px;">${lang === 'zh' ? x[1] : x[2]}</span><br>
+                <span id="e_${x[0]}" style="color:#666;font-style:italic;font-size:10px;">${lang === 'zh' ? x[2] : x[1]}</span>
+            </div>
+            <input type="checkbox" id="${x[0]}" onchange="run();" data-zh="${x[3]}" data-en="${x[4]}">
+        </label>
+    `).join('');
+
+    document.getElementById('mGrd').innerHTML = db.filter(x => x[5] === 1).map(x => `
+        <label class="item" for="${x[0]}">
+            <div>
+                <span id="n_${x[0]}" style="color:#ff6666;font-weight:bold;font-size:11px;">${lang === 'zh' ? x[1] : x[2]}</span><br>
+                <span id="e_${x[0]}" style="color:#666;font-style:italic;font-size:10px;">${lang === 'zh' ? x[2] : x[1]}</span>
+            </div>
+            <input type="checkbox" id="${x[0]}" onchange="run();" data-zh="${x[3]}" data-en="${x[4]}">
+        </label>
+    `).join('');
+}
+
 function render() {
     const t = text[lang];
+    document.getElementById('page_title').innerText = t.t;
     document.getElementById('ui_title').innerText = t.t;
     document.getElementById('ui_ot').innerText = t.ot;
     document.getElementById('ui_cb').innerText = t.cb;
     document.getElementById('ui_s1').innerText = t.s1;
     document.getElementById('ui_s2').innerText = t.s2;
     document.getElementById('ui_cl').innerText = t.cl;
-    document.getElementById('ui_hb').innerText = pnlVisible() ? "摺疊詳細使用說明" : "展開詳細使用說明";
-    document.getElementById('b_zh').className = "t-btn" + (lang==='zh'?" act":"");
-    document.getElementById('b_en').className = "t-btn" + (lang==='en'?" act":"");
-    run();
+    
+    const pnl = document.getElementById('gPnl');
+    pnl.innerHTML = t.helpHtml;
+    
+    // 【核心優化】：精准校準按鈕內部的中文/英文文字提示
+    const isVisible = pnlVisible();
+    document.getElementById('ui_hb').innerText = isVisible ? t.hb_hide : t.hb_show;
+    document.getElementById('ui_hb_btn').className = "t-btn" + (isVisible ? " act" : "");
+    
+    document.getElementById('b_zh').className = "t-btn" + (lang === 'zh' ? " act" : "");
+    document.getElementById('b_en').className = "t-btn" + (lang === 'en' ? " act" : "");
 }
-function pnlVisible() { return document.getElementById('gPnl').style.display === "block"; }
+
+function pnlVisible() { 
+    return document.getElementById('gPnl').style.display === "block"; 
+}
+
 function run() {
     let arr = [];
     db.forEach(x => {
         const el = document.getElementById(x[0]);
-        localStorage.setItem("p_r_c_"+x[0], el.checked ? "1" : "0");
-        if (el.checked) arr.push(lang === 'zh' ? el.getAttribute('data-zh') : el.getAttribute('data-en'));
+        if (el) {
+            localStorage.setItem("p_r_c_" + x[0], el.checked ? "1" : "0");
+            if (el.checked) {
+                arr.push(lang === 'zh' ? el.getAttribute('data-zh') : el.getAttribute('data-en'));
+            }
+        }
     });
-    document.getElementById('res').value = arr.length > 0 ? `"${arr.join('|')}"` : '""';
+    document.getElementById('res').value = arr.length > 0 ? arr.join('|') : '';
 }
-function setL(l) { lang = l; localStorage.setItem('p_r_l', l); render(); }
+
+// 核心多語言無刷新實時文字切換更新
+function setL(l) { 
+    lang = l; 
+    localStorage.setItem('p_r_l', l); 
+    
+    render();
+    
+    db.forEach(x => {
+        const nameEl = document.getElementById(`n_${x[0]}`);
+        const subEl = document.getElementById(`e_${x[0]}`);
+        if (nameEl) nameEl.innerText = (lang === 'zh' ? x[1] : x[2]);
+        if (subEl) subEl.innerText = (lang === 'zh' ? x[2] : x[1]);
+    });
+    run(); // 切換語言時同步整理一次正則字串
+}
+
+// 【核心修復】：重寫全自動面板切換函數，防止狀態打架
 function tglG() {
     const p = document.getElementById('gPnl');
     const v = p.style.display === "block";
     p.style.display = v ? "none" : "block";
     localStorage.setItem('p_g_v', v ? "0" : "1");
-    document.getElementById('ui_hb').innerText = v ? "展開詳細使用說明" : "摺疊詳細使用說明";
+    
+    // 狀態切換後，只去校準按鈕和說明文字，不觸發多餘的 run() 循環
+    const t = text[lang];
+    document.getElementById('ui_hb').innerText = v ? t.hb_show : t.hb_hide;
+    document.getElementById('ui_hb_btn').className = "t-btn" + (v ? "" : " act");
 }
+
 window.onload = function() {
-    db.forEach(x => { if (localStorage.getItem("p_r_c_"+x[0]) === "1") document.getElementById(x[0]).checked = true; });
-    if (localStorage.getItem('p_g_v') === "1") document.getElementById('gPnl').style.display = "block";
+    renderGrid();
+    
+    if (localStorage.getItem('p_g_v') === "1") {
+        document.getElementById('gPnl').style.display = "block";
+    } else {
+        document.getElementById('gPnl').style.display = "none";
+    }
+    
+    db.forEach(x => { 
+        const el = document.getElementById(x[0]);
+        if (el && localStorage.getItem("p_r_c_" + x[0]) === "1") {
+            el.checked = true; 
+        }
+    });
+    
     render();
+    run(); // 初始化時最後執行一次正則生成，確保歷史選框生效
 }
+
 function cp() {
-    const o = document.getElementById('res'); o.select(); document.execCommand('copy');
+    const o = document.getElementById('res'); 
+    if (!o.value) return;
+    o.select(); 
+    document.execCommand('copy');
     alert(text[lang].cp);
 }
+
 function cls() {
-    db.forEach(x => { document.getElementById(x[0]).checked = false; localStorage.removeItem("p_r_c_"+x[0]); });
+    db.forEach(x => { 
+        const el = document.getElementById(x[0]);
+        if (el) {
+            el.checked = false; 
+            localStorage.removeItem("p_r_c_" + x[0]); 
+        }
+    });
     run();
 }
 </script>

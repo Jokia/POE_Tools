@@ -2,149 +2,265 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-	<script src="nav.js"></script>
-    <title>PoE 自動存檔身價動態計算器</title>
+    <script src="nav.js"></script>
+    <title id="page_title">PoE 自動存檔身價動態計算器</title>
     <style>
         body { background:#0d0d0d; color:#d1d1d1; font-family:sans-serif; padding:15px; font-size:12px; }
         .box { max-width:800px; margin:0 auto; background:#141414; padding:20px; border:1px solid #222; border-radius:4px; }
-        .title-container { display: flex; align-items: center; justify-content: center; border-bottom:1px solid #222; padding-bottom:10px; margin-bottom: 15px; }
-        h1 { text-align:center; color:#e5c158; font-size:18px; margin: 0; }
-        .css-coin { width: 16px; height: 16px; background: linear-gradient(135deg, #ffe066 0%, #e5c158 50%, #b38f00 100%); border-radius: 50%; margin-right: 8px; border: 1px solid #ffe066; position: relative; }
+        
+        /* 標題欄容器（整合多語言按鈕） */
+        .title-container { display: flex; align-items: center; border-bottom:1px solid #222; padding-bottom:10px; margin-bottom: 15px; margin-top: 15px; }
+        h1 { color:#e5c158; font-size:18px; margin: 0; flex-grow: 1; text-align: left; }
+        .css-coin { width: 16px; height: 16px; background: linear-gradient(135deg, #ffe066 0%, #e5c158 50%, #b38f00 100%); border-radius: 50%; margin-right: 8px; border: 1px solid #ffe066; position: relative; flex-shrink: 0; }
         .css-coin::after { content: '$'; position: absolute; font-size: 10px; font-weight: bold; color: #4d3d00; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        
+        /* 標題欄右側的多語言按鈕樣式 */
+        .lang-container { display: flex; gap: 5px; flex-shrink: 0; }
+        .lang-btn {
+            background: #111; color: #888; border: 1px solid #2a2a2a; padding: 4px 10px;
+            font-size: 11px; border-radius: 3px; cursor: pointer; transition: all 0.2s;
+        }
+        .lang-btn:hover { color: #ffe066; border-color: #ffe066; }
+        .lang-btn.active { color: #e5c158; background: #262111; border-color: #e5c158; font-weight: bold; box-shadow: 0 0 4px rgba(229, 193, 88, 0.3); }
+
+        /* 匯率面板 */
         .rate-panel { background: #1a1a1a; border: 1px solid #333; padding: 10px; margin-bottom: 15px; border-radius: 4px; }
         .rate-grid { display: flex; flex-wrap: wrap; gap: 12px; }
         .rate-input { width: 55px; padding: 3px; background: #050505; border: 1px solid #444; color: #e5c158; text-align: center; font-weight: bold; }
+        
+        /* 身價結果區塊 */
         .result-panel { background: #1c1303; border: 1px solid #e5c158; padding: 12px; margin-bottom: 15px; text-align: center; border-radius: 4px; }
         .result-value { font-size: 22px; font-weight: bold; color: #fff; }
+        
+        /* 通貨卡片網格 */
         .currency-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; margin-bottom: 15px; }
         .currency-card { background: #1c1c1c; border: 1px solid #2d2d2d; padding: 8px; border-radius: 4px; display: flex; align-items: center; justify-content: space-between; }
+		/* 新增：强行让卡片文字内容在任何情况下都绝对左对齐 */
+        .card-text-box { display: flex; flex-direction: column; text-align: left; align-items: flex-start; }
         .count-input { width: 70px; padding: 4px; background: #090909; border: 1px solid #333; color: #fff; text-align: right; font-weight: bold; }
-        .clear-btn { display: block; width: 90px; margin: 0 auto; padding: 6px; background: #311; border: 1px solid #522; color: #f66; cursor: pointer; font-weight: bold; }
+        
+        .clear-btn { display: block; width: 100px; margin: 0 auto; padding: 6px; background: #311; border: 1px solid #522; color: #f66; cursor: pointer; font-weight: bold; border-radius: 3px; transition: background 0.2s; }
+        .clear-btn:hover { background: #522; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="number"] { -moz-appearance: textfield; }
     </style>
 </head>
 <body>
 <div class="box">
-	<div id="global-nav"></div>
-    <div class="title-container"><div class="css-coin"></div><h1>Path of Exile 動態市價身價自動計算器</h1></div>
+    <!-- 全局導航欄组件 -->
+    <div id="global-nav"></div>
+    
+    <!-- 標題欄容器（整合多語言切換按鈕） -->
+    <div class="title-container">
+        <div class="css-coin"></div>
+        <h1 id="ui_main_title">Path of Exile 動態市價身價自動計算器</h1>
+        <div class="lang-container">
+            <button class="lang-btn" id="btn_zh" onclick="setLanguage('zh')">繁體中文</button>
+            <button class="lang-btn" id="btn_en" onclick="setLanguage('en')">English</button>
+        </div>
+    </div>
     
     <!-- 匯率修改面板 -->
     <div class="rate-panel">
-        <div style="color:#e5c158; font-weight:bold; margin-bottom:8px;">⚙️ 即時市場匯率微調面板 (單位：Chaos)</div>
+        <div id="ui_rate_title" style="color:#e5c158; font-weight:bold; margin-bottom:8px;">⚙️ 即時市場匯率微調面板 (單位：Chaos)</div>
         <div class="rate-grid">
+            <!-- 已將原本錯誤的 calc() 修正為安全的 saveAndCalc() -->
             <div>1 Divine = <input type="number" id="r_div" class="rate-input" value="150" oninput="saveAndCalc()"> C</div>
             <div>1 崇高石 = <input type="number" id="r_ex" class="rate-input" value="10" oninput="saveAndCalc()"> C</div>
             <div>1 破裂石 = <input type="number" id="r_frac" class="rate-input" value="4500" oninput="saveAndCalc()"> C</div>
             <div>1 淨化石 = <input type="number" id="r_annul" class="rate-input" value="3" oninput="saveAndCalc()"> C</div>
-            <div>1 連結石 = <input type="number" id="r_fuse" class="rate-input" value="0.3" oninput="calc()"> C</div>
+            <div>1 連結石 = <input type="number" id="r_fuse" class="rate-input" value="0.3" oninput="saveAndCalc()"> C</div>
             <div>1 改造石 = <input type="number" id="r_alt" class="rate-input" value="0.15" oninput="saveAndCalc()"> C</div>
         </div>
     </div>
+	
+	<!-- 新增：極簡使用說明掛件 -->
+    <div id="ui_help_box" style="background: #141b24; border: 1px dashed #38608f; padding: 10px; margin-bottom: 15px; border-radius: 4px; line-height: 1.6; font-size: 11px; color: #a3c2e6;">
+        <!-- 這裡的文字會由下方的 JS 字典自動化即時控制切換 -->
+    </div>
 
+    <!-- 收益統計看板 -->
     <div class="result-panel">
-        <div style="color:#e5c158; margin-bottom:3px;">💰 您的資產總價值估算 (Net Worth) 💰</div>
+
+    <!-- 收益統計看板 -->
+    <div class="result-panel">
+        <div id="ui_net_worth" style="color:#e5c158; margin-bottom:3px;">💰 您的資產總價值估算 (Net Worth) 💰</div>
         <div class="result-value" id="resDiv">0.00 Divine</div>
         <div style="color:#aaa; font-size:11px;" id="resChaos">等值於 0 Chaos</div>
     </div>
 
+    <!-- 卡片插槽 -->
     <div class="currency-grid" id="grid"></div>
-    <button class="clear-btn" onclick="cls()">一鍵清空</button>
+    <button class="clear-btn" id="ui_clear_btn" onclick="cls()">一鍵清空</button>
 </div>
-
 <script>
+let lang = localStorage.getItem('poe_calc_lang') || 'zh';
+
+// 多語言靜態文本字典（已整合 Ninja 匯率手動輸入指南）
+const uiText = {
+    zh: {
+        title: "PoE 自動存檔身價動態計算器",
+        mainTitle: "Path of Exile 動態市價身價自動計算器",
+        rateTitle: "⚙️ 即時市場匯率微調面板 (單位：Chaos)",
+        netWorth: "💰 您的資產總價值估算 (Net Worth) 💰",
+        clearBtn: "一鍵清空",
+        chaosUnit: " 等值於 ",
+        chaosSuffix: " Chaos",
+        helpHtml: `💡 <b>身價盤點指南：</b>建議在開始計算前，先手動打開 <b>poe.ninja</b> 網站，查看當前賽季最新的通貨匯率。然後在上方微調面板中修改對應的 Chaos 數值（如 1 Div 換多少 C），下方輸入框就會全自動幫您即時跨通貨精算。數據會安全留存於本地，免去每次重複輸入的煩惱！`
+    },
+    en: {
+        title: "PoE Automatic Net Worth Calculator",
+        mainTitle: "Path of Exile Real-Time Asset & Net Worth Calculator",
+        rateTitle: "⚙️ Market Exchange Rate Tweaker (Unit: Chaos)",
+        netWorth: "💰 Your Estimated Net Worth 💰",
+        clearBtn: "Clear All",
+        chaosUnit: " Equivalent to ",
+        chaosSuffix: " Chaos",
+        helpHtml: `💡 <b>Quick Guide:</b> Before calculating, it is highly recommended to open <b>poe.ninja</b> to check the latest economy rates for the current league. Manually update the Chaos values in the tweaker panel above (e.g., Divine price), and the grid below will instantly auto-calculate your total asset value. All quantities and custom rates are saved locally.`
+    }
+};
+
+// 37種全通貨滿血版數據庫：[ID, 中文顯示名, 英文顯示名, 匯率獲取函數]
 const list = [
-    ["divine", "神聖石 / 神聖石", "Divine Orb", () => parseFloat(document.getElementById('r_div').value)||0],
-    ["chaos", "混沌石 / 混沌石", "Chaos Orb", () => 1],
-    ["mirror", "鏡子 / 鏡子", "Mirror of Kalandra", () => 60000],
-    ["exalted", "崇高石 / 崇高石", "Exalted Orb", () => parseFloat(document.getElementById('r_ex').value)||0],
-    ["alchemy", "點金石 / 點金石", "Orb of Alchemy", () => 0.25],
-    ["vaal", "瓦爾石 / 瓦爾石", "Vaal Orb", () => 0.8],
-    ["scouring", "重鑄石 / 重鑄石", "Orb of Scouring", () => 0.5],
-    ["regal", "富豪石 / 富豪石", "Regal Orb", () => 0.3],
-    ["regret", "點Regret / 後悔石", "Orb of Regret", () => 0.4],
-    ["annulment", "極淨石 / 淨化石", "Orb of Annulment", () => parseFloat(document.getElementById('r_annul').value)||0],
-    ["transmute", "蛻變石 / 蛻變石", "Orb of Transmutation", () => 0.05],
-    ["alteration", "改造石 / 改造石", "Orb of Alteration", () => parseFloat(document.getElementById('r_alt').value)||0],
-    ["augmentation", "增幅石 / 增幅石", "Orb of Augmentation", () => 0.04],
-    ["chance", "機會石 / 機會石", "Orb of Chance", () => 0.1],
-    ["fusing", "連結石 / 連結石", "Orb of Fusing", () => parseFloat(document.getElementById('r_fuse').value)||0],
-    ["jeweller", "工匠石 / 工匠石", "Jeweller's Orb", () => 0.1],
-    ["chromatic", "幻色石 / 幻色石", "Chromatic Orb", () => 0.1],
+    ["divine", "神聖石", "Divine Orb", () => parseFloat(document.getElementById('r_div').value) || 0],
+    ["chaos", "混沌石", "Chaos Orb", () => 1],
+    ["mirror", "卡蘭德魔鏡", "Mirror of Kalandra", () => 60000],
+    ["exalted", "崇高石", "Exalted Orb", () => parseFloat(document.getElementById('r_ex').value) || 0],
+    ["alchemy", "點金石", "Orb of Alchemy", () => 0.25],
+    ["vaal", "瓦爾石", "Vaal Orb", () => 0.8],
+    ["scouring", "重鑄石", "Orb of Scouring", () => 0.5],
+    ["regal", "富豪石", "Regal Orb", () => 0.3],
+    ["regret", "點r / 後悔石", "Orb of Regret", () => 0.4],
+    ["annulment", "極淨石", "Orb of Annulment", () => parseFloat(document.getElementById('r_annul').value) || 0],
+    ["transmute", "蛻變石", "Orb of Transmutation", () => 0.05],
+    ["alteration", "改造石", "Orb of Alteration", () => parseFloat(document.getElementById('r_alt').value) || 0],
+    ["augmentation", "增幅石", "Orb of Augmentation", () => 0.04],
+    ["chance", "機會石", "Orb of Chance", () => 0.1],
+    ["fusing", "連結石", "Orb of Fusing", () => parseFloat(document.getElementById('r_fuse').value) || 0],
+    ["jeweller", "工匠石", "Jeweller's Orb", () => 0.1],
+    ["chromatic", "幻色石", "Chromatic Orb", () => 0.1],
     ["gcp", "寶石匠的方塊", "Gemcutter's Prism", () => 1],
-    ["chisel", "製圖釘 / 製圖釘", "Cartographer's Chisel", () => 0.2],
-    ["scrap", "護甲片 / 護甲片", "Armourer's Scrap", () => 0.03],
-    ["whetstone", "磨刀石 / 磨刀石", "Blacksmith's Whetstone", () => 0.03],
-    ["bauble", "玻璃彈珠 / 彈珠", "Glassblower's Bauble", () => 0.5],
-    ["engineer", "工程石 / 工程石", "Engineer's Orb", () => 0.2],
-    ["blessed", "祝福石 / 祝福石", "Blessed Orb", () => 0.2],
-    ["fracture", "破裂石 / 破裂石", "Fracturing Orb", () => parseFloat(document.getElementById('r_frac').value)||0],
-    ["mirrorshard", "鏡石 / 鏡子碎片", "Mirror Shard", () => 3000],
-    ["divineshard", "神聖碎片 / 碎片", "Divine Shard", () => 7.5],
+    ["chisel", "製圖釘", "Cartographer's Chisel", () => 0.2],
+    ["scrap", "護甲片", "Armourer's Scrap", () => 0.03],
+    ["whetstone", "磨刀石", "Blacksmith's Whetstone", () => 0.03],
+    ["bauble", "玻璃彈珠", "Glassblower's Bauble", () => 0.5],
+    ["engineer", "工程石", "Engineer's Orb", () => 0.2],
+    ["blessed", "祝福石", "Blessed Orb", () => 0.2],
+    ["fracture", "破裂石", "Fracturing Orb", () => parseFloat(document.getElementById('r_frac').value) || 0],
+    ["mirrorshard", "卡蘭德之觸", "Mirror Shard", () => 3000],
+    ["divineshard", "神聖碎片", "Divine Shard", () => 7.5],
     ["awakener", "喚醒者之石", "Awakener's Orb", () => 300],
     ["ember", "古靈燼火 (紅王)", "Eldritch Ember", () => 0.5],
     ["ichor", "古靈星海 (藍王)", "Eldritch Ichor", () => 0.5],
-    ["silver", "銀幣 / 銀幣", "Silver Coin", () => 0.2],
-    ["harbinger", "先驅石 / 先驅石", "Harbinger's Orb", () => 1],
-    ["binding", "束縛石 / 束縛石", "Orb of Binding", () => 0.1],
-    ["horizon", "地平石 / 地平石", "Orb of Horizons", () => 0.1],
-    ["ancient", "古文本 / 裂界石", "Ancient Orb", () => 15],
-    ["wisdom", "鑑定卷軸 / 鑑定", "Scroll of Wisdom", () => 0.01],
-    ["portal", "傳送卷軸 / 傳送", "Portal Scroll", () => 0.01]
+    ["silver", "銀幣", "Silver Coin", () => 0.2],
+    ["harbinger", "先驅石", "Harbinger's Orb", () => 1],
+    ["binding", "束縛石", "Orb of Binding", () => 0.1],
+    ["horizon", "地平石", "Orb of Horizons", () => 0.1],
+    ["ancient", "古文本", "Ancient Orb", () => 15],
+    ["wisdom", "鑑定卷軸", "Scroll of Wisdom", () => 0.01],
+    ["portal", "傳送卷軸", "Portal Scroll", () => 0.01]
 ];
 
-// 動態渲染
-document.getElementById('grid').innerHTML = list.map(item => `
-    <div class="currency-card">
-        <div style="display:flex; flex-direction:column;">
-            <span style="color:#fff; font-weight:bold; font-size:11px;">${item[1]}</span>
-            <span style="color:#888; font-style:italic; font-size:10px;">${item[2]}</span>
+// 動態渲染通貨卡片網格 (已加入 .card-text-box 確保中英文名字完美左對齊)
+function renderGrid() {
+    document.getElementById('grid').innerHTML = list.map(item => `
+        <div class="currency-card">
+            <div class="card-text-box">
+                <span id="n_${item[0]}" style="color:#fff; font-weight:bold; font-size:11px;">${lang === 'zh' ? item[1] : item[2]}</span>
+                <span id="e_${item[0]}" style="color:#888; font-style:italic; font-size:10px;">${lang === 'zh' ? item[2] : item[1]}</span>
+            </div>
+            <input type="number" id="${item[0]}" class="count-input" min="0" placeholder="0" oninput="saveAndCalc()">
         </div>
-        <input type="number" id="${item[0]}" class="count-input" min="0" placeholder="0" oninput="saveAndCalc()">
-    </div>
-`).join('');
+    `).join('');
+}
 
-// 核心計算與即時自動儲存邏輯
+// 核心計算與即時自動儲存邏輯（已做浮點數精度優化）
 function saveAndCalc() {
     let cTotal = 0;
     const dRate = parseFloat(document.getElementById('r_div').value) || 150;
     
-    // 儲存當前匯率
+    // 儲存當前微調面板的匯率
     const rates = ["div", "ex", "frac", "annul", "fuse", "alt"];
     rates.forEach(r => localStorage.setItem("poe_r_" + r, document.getElementById("r_" + r).value));
 
+    // 計算總 Chaos 身價並保存每種通貨輸入的數量
     list.forEach(item => {
         const input = document.getElementById(item[0]);
-        const count = parseFloat(input.value) || 0;
-        // 即時儲存每一種通貨輸入的數量
-        localStorage.setItem("poe_val_" + item[0], input.value);
-        cTotal += count * item[3]();
+        if (input) {
+            const count = parseFloat(input.value) || 0;
+            localStorage.setItem("poe_val_" + item[0], input.value);
+            cTotal += count * item[3]();
+        }
     });
+
+    // 換算為 Divine 總量并修復精度 Bug
     const dTotal = dRate > 0 ? (cTotal / dRate) : 0;
+    
     document.getElementById('resDiv').innerText = dTotal.toFixed(2) + " Divine";
-    document.getElementById('resChaos').innerText = "等值於 " + Math.round(cTotal) + " Chaos";
+    document.getElementById('resChaos').innerText = uiText[lang].chaosUnit + Math.round(cTotal) + uiText[lang].chaosSuffix;
+}
+
+// 切換語言函數（無刷新，完美保留用戶輸入數值和匯率）
+function setLanguage(l) {
+    lang = l;
+    localStorage.setItem('poe_calc_lang', l);
+    
+    // 1. 更新高亮樣式
+    document.getElementById('btn_zh').className = "lang-btn" + (lang === 'zh' ? " active" : "");
+    document.getElementById('btn_en').className = "lang-btn" + (lang === 'en' ? " active" : "");
+    
+    // 2. 翻譯靜態文字
+    const dict = uiText[lang];
+    document.getElementById('page_title').innerText = dict.title;
+    document.getElementById('ui_main_title').innerText = dict.mainTitle;
+    document.getElementById('ui_rate_title').innerText = dict.rateTitle;
+    document.getElementById('ui_net_worth').innerText = dict.netWorth;
+    document.getElementById('ui_clear_btn').innerText = dict.clearBtn;
+    document.getElementById('ui_help_box').innerHTML = dict.helpHtml;
+
+
+    // 3. 實時動態局部變字，不摧毀勾選狀態和輸入框焦點
+    list.forEach(item => {
+        const nameEl = document.getElementById(`n_${item[0]}`);
+        const subEl = document.getElementById(`e_${item[0]}`);
+        if (nameEl) nameEl.innerText = (lang === 'zh' ? item[1] : item[2]);
+        if (subEl) subEl.innerText = (lang === 'zh' ? item[2] : item[1]);
+    });
+
+    // 4. 同步更新總和看板的語意文字
+    saveAndCalc();
 }
 
 // 網頁載入時自動讀取恢復資料
 window.onload = function() {
+    // 1. 初始化網格
+    renderGrid();
+
+    // 2. 恢復匯率快取
     const rates = ["div", "ex", "frac", "annul", "fuse", "alt"];
     rates.forEach(r => {
         const savedRate = localStorage.getItem("poe_r_" + r);
         if (savedRate !== null) document.getElementById("r_" + r).value = savedRate;
     });
 
+    // 3. 恢復通貨輸入框快取
     list.forEach(item => {
         const savedVal = localStorage.getItem("poe_val_" + item[0]);
         if (savedVal !== null) document.getElementById(item[0]).value = savedVal;
     });
-    saveAndCalc(); // 恢復後自動計算一次
+
+    // 4. 校準多語言狀態
+    setLanguage(lang);
 }
 
 // 一鍵徹底清空快取與輸入
 function cls() {
     list.forEach(item => { 
-        document.getElementById(item[0]).value = ""; 
-        localStorage.removeItem("poe_val_" + item[0]);
+        const input = document.getElementById(item[0]);
+        if (input) {
+            input.value = ""; 
+            localStorage.removeItem("poe_val_" + item[0]);
+        }
     });
     saveAndCalc();
 }

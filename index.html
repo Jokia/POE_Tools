@@ -2,23 +2,43 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-	<script src="nav.js"></script>
-    <title>PoE 43種全通貨中英及縮寫速查表</title>
+    <script src="nav.js"></script>
+    <title id="page_title">PoE 43種全通貨中英及縮寫速查表</title>
     <style>
         body { background:#0d0d0d; color:#d1d1d1; font-family:sans-serif; padding:20px; font-size:13px; }
         .box { max-width:800px; margin:0 auto; background:#141414; padding:20px; border:1px solid #222; border-radius:4px; }
         
-        /* 標題欄及其他樣式 */
-        .title-container { display: flex; align-items: center; justify-content: center; border-bottom:1px solid #222; padding-bottom:10px; margin-bottom: 15px; }
-        h1 { text-align:center; color:#e5c158; font-size:20px; margin: 0; }
+        /* ================= 標題欄容器（已整合多語言按鈕） ================= */
+        .title-container { 
+            display: flex; 
+            align-items: center; 
+            border-bottom:1px solid #222; 
+            padding-bottom:10px; 
+            margin-bottom: 15px; 
+            margin-top: 15px; 
+        }
+        h1 { color:#e5c158; font-size:20px; margin: 0; flex-grow: 1; text-align: left; }
+        
         .css-coin {
             width: 18px; height: 18px;
             background: linear-gradient(135deg, #ffe066 0%, #e5c158 50%, #b38f00 100%);
             border-radius: 50%; margin-right: 10px;
             box-shadow: 0 0 4px rgba(229, 193, 88, 0.6);
             border: 1px solid #ffe066; position: relative;
+            flex-shrink: 0;
         }
         .css-coin::after { content: '$'; position: absolute; font-size: 11px; font-weight: bold; color: #4d3d00; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+        /* 標題欄右側的按鈕樣式 */
+        .lang-container { display: flex; gap: 5px; flex-shrink: 0; }
+        .lang-btn {
+            background: #111; color: #888; border: 1px solid #2a2a2a; padding: 4px 10px;
+            font-size: 11px; border-radius: 3px; cursor: pointer; transition: all 0.2s;
+        }
+        .lang-btn:hover { color: #ffe066; border-color: #ffe066; }
+        .lang-btn.active { color: #e5c158; background: #262111; border-color: #e5c158; font-weight: bold; box-shadow: 0 0 4px rgba(229, 193, 88, 0.3); }
+        /* ========================================================= */
+
         input { width:100%; padding:10px; background:#090909; border:1px solid #222; color:#fff; margin-bottom:15px; box-sizing:border-box; }
         table { width:100%; border-collapse:collapse; }
         th { background:#1a1a1a; color:#e5c158; text-align:left; padding:8px; font-weight:bold; border-bottom:1px solid #222; }
@@ -29,19 +49,52 @@
 </head>
 <body>
 <div class="box">
+    <!-- 全局導航欄 -->
     <div id="global-nav"></div>
+    
+    <!-- 標題欄容器（包含硬幣、標題、多語言按鈕） -->
     <div class="title-container">
         <div class="css-coin"></div>
-        <h1>Path of Exile 通貨倉庫頁全幣種速查大典</h1>
+        <h1 id="ui_main_title">Path of Exile 通貨倉庫頁全幣種速查大典</h1>
+        <div class="lang-container">
+            <button class="lang-btn" id="btn_zh" onclick="setLanguage('zh')">繁體中文</button>
+            <button class="lang-btn" id="btn_en" onclick="setLanguage('en')">English</button>
+        </div>
     </div>
     
     <input type="text" id="api" placeholder="🔍 輸入通貨名稱、英文全稱、官方縮寫(如 Div, C, Alch)過濾...">
     <table id="tbl">
-        <thead><tr><th>中文名稱 (繁/簡)</th><th>英文名稱</th><th>常見縮寫 / 代稱</th></tr></thead>
+        <thead>
+            <tr>
+                <th id="th_zh">中文名稱</th>
+                <th id="th_en">英文名稱</th>
+                <th id="th_abbr">常見縮寫 / 代稱</th>
+            </tr>
+        </thead>
         <tbody id="db"></tbody>
     </table>
 </div>
 <script>
+// 多语言静态文本字典
+const uiText = {
+    zh: {
+        title: "PoE 43種全通貨中英及縮寫速查表",
+        mainTitle: "Path of Exile 通貨倉庫頁全幣種速查大典",
+        placeholder: "🔍 輸入通貨名稱、英文全稱、官方縮寫(如 Div, C, Alch)過濾...",
+        thZh: "中文名稱",
+        thEn: "英文名稱",
+        thAbbr: "常見縮寫 / 代稱"
+    },
+    en: {
+        title: "PoE 43 Currency Classes & Abbreviations Cheatsheet",
+        mainTitle: "Path of Exile Currency Tab Full Catalog Reference",
+        placeholder: "🔍 Type currency name, English title, or abbreviation (e.g., Div, C, Alch) to filter...",
+        thZh: "Chinese Name",
+        thEn: "English Name",
+        thAbbr: "Common Abbreviation / Alias"
+    }
+};
+
 const data = [
     ["神聖石","Divine Orb","Div / Divine"],
     ["混沌石","Chaos Orb","C / Chaos"],
@@ -88,15 +141,48 @@ const data = [
     ["鑑定卷軸","Scroll of Wisdom","Wisdom / 鑑定"],
     ["傳送卷軸","Portal Scroll","Portal / 傳送"]
 ];
-const html = data.map(r => `<tr><td style="color:#fff;font-weight:bold;">${r[0]}</td><td style="color:#999;font-style:italic;">${r[1]}</td><td><span class="tag">${r[2]}</span></td></tr>`).join('');
-document.getElementById('db').innerHTML = html;
-document.getElementById('api').addEventListener('keyup', function() {
-    let f = this.value.toUpperCase();
-    let trs = document.getElementById('db').getElementsByTagName('tr');
-    for (let i = 0; i < trs.length; i++) {
-        trs[i].style.display = trs[i].innerText.toUpperCase().indexOf(f) > -1 ? "" : "none";
-    }
-});
+
+let currentLang = localStorage.getItem('poe_currency_lang') || 'zh';
+
+// 渲染表格函数
+function renderTable() {
+    const html = data.map(r => `<tr><td style="color:#fff;font-weight:bold;">${r[0]}</td><td style="color:#999;font-style:italic;">${r[1]}</td><td><span class="tag">${r[2]}</span></td></tr>`).join('');
+    document.getElementById('db').innerHTML = html;
+}
+
+// 切换语言函数
+function setLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem('poe_currency_lang', lang);
+    
+    // 更新高亮样式
+    document.getElementById('btn_zh').className = "lang-btn" + (lang === 'zh' ? " active" : "");
+    document.getElementById('btn_en').className = "lang-btn" + (lang === 'en' ? " active" : "");
+    
+    // 翻译界面文本
+    const dict = uiText[lang];
+    document.getElementById('page_title').innerText = dict.title;
+    document.getElementById('ui_main_title').innerText = dict.mainTitle;
+    document.getElementById('api').placeholder = dict.placeholder;
+    document.getElementById('th_zh').innerText = dict.thZh;
+    document.getElementById('th_en').innerText = dict.thEn;
+    document.getElementById('th_abbr').innerText = dict.thAbbr;
+}
+
+// 初始化加载
+window.onload = function() {
+    renderTable();
+    setLanguage(currentLang);
+    
+    // 绑定搜索过滤事件
+    document.getElementById('api').addEventListener('keyup', function() {
+        let f = this.value.toUpperCase();
+        let trs = document.getElementById('db').getElementsByTagName('tr');
+        for (let i = 0; i < trs.length; i++) {
+            trs[i].style.display = trs[i].innerText.toUpperCase().indexOf(f) > -1 ? "" : "none";
+        }
+    });
+}
 </script>
 </body>
 </html>
