@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>PoE 43種全通貨中英及縮寫速查表</title>
+    <style>
+        body { background:#0d0d0d; color:#d1d1d1; font-family:sans-serif; padding:20px; font-size:13px; }
+        .box { max-width:800px; margin:0 auto; background:#141414; padding:20px; border:1px solid #222; border-radius:4px; }
+        
+        /* 核心修復：純CSS繪製的黃金硬幣圖示，徹底告別系統字型限制 */
+        .title-container { display: flex; align-items: center; justify-content: center; border-bottom:1px solid #222; padding-bottom:10px; margin-bottom: 15px; }
+        h1 { text-align:center; color:#e5c158; font-size:20px; margin: 0; }
+        .css-coin {
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, #ffe066 0%, #e5c158 50%, #b38f00 100%);
+            border-radius: 50%;
+            margin-right: 10px;
+            box-shadow: 0 0 4px rgba(229, 193, 88, 0.6);
+            border: 1px solid #ffe066;
+            position: relative;
+        }
+        .css-coin::after {
+            content: '$';
+            position: absolute;
+            font-size: 11px;
+            font-weight: bold;
+            color: #4d3d00;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        input { width:100%; padding:10px; background:#090909; border:1px solid #222; color:#fff; margin-bottom:15px; box-sizing:border-box; }
+        table { width:100%; border-collapse:collapse; }
+        th { background:#1a1a1a; color:#e5c158; text-align:left; padding:8px; font-weight:bold; border-bottom:1px solid #222; }
+        td { padding:8px; border-bottom:1px solid #222; }
+        tr:hover { background:#1e1e1e; }
+        .tag { background:#16222f; color:#4da6ff; border:1px solid #20374f; padding:1px 5px; border-radius:3px; font-size:11px; font-family:monospace; }
+    </style>
+</head>
+<body>
+<div class="box">
+    <!-- 標題欄容器 -->
+    <div class="title-container">
+        <div class="css-coin"></div>
+        <h1>Path of Exile 通貨倉庫頁全幣種速查大典</h1>
+    </div>
+    
+    <input type="text" id="api" placeholder="🔍 輸入通貨名稱、英文全稱、官方縮寫(如 Div, C, Alch)過濾...">
+    <table id="tbl">
+        <thead><tr><th>中文名稱 (繁/簡)</th><th>英文名稱</th><th>常見縮寫 / 代稱</th></tr></thead>
+        <tbody id="db"></tbody>
+    </table>
+</div>
+<script>
+const data = [
+    ["神聖石","Divine Orb","Div / Divine"],
+    ["混沌石","Chaos Orb","C / Chaos"],
+    ["點金石","Orb of Alchemy","Alch / Alchemy"],
+    ["瓦爾石","Vaal Orb","Vaal"],
+    ["崇高石","Exalted Orb","Ex / Exalted"],
+    ["鏡子","Mirror of Kalandra","Mirror / 鏡子"],
+    ["重鑄石","Orb of Scouring","Scour / 重鑄"],
+    ["富豪石","Regal Orb","Regal / 富豪"],
+    ["點r","Orb of Regret","Regret / 後悔"],
+    ["極淨石","Orb of Annulment","Annul / 剝離"],
+    ["蛻變石","Orb of Transmutation","Trans / Transmute"],
+    ["改造石","Orb of Alteration","Alt / Alts / 改造"],
+    ["增幅石","Orb of Augmentation","Aug / Augment"],
+    ["機會石","Orb of Chance","Chance / 機會"],
+    ["連結石","Orb of Fusing","Fusing / Fuse / Link"],
+    ["工匠石","Jeweller's Orb","Jew / Jeweller / 工匠"],
+    ["幻色石","Chromatic Orb","Chrome / Chromatic / 幻色"],
+    ["寶石匠的方塊","Gemcutter's Prism","GCP / 寶石匠"],
+    ["製圖釘","Cartographer's Chisel","Chisel / 釘子"],
+    ["護甲片","Armourer's Scrap","Scrap / 護甲片"],
+    ["磨刀石","Blacksmith's Whetstone","Whetstone / 磨刀石"],
+    ["玻璃彈珠","Glassblower's Bauble","Bauble / 彈珠"],
+    ["工程石","Engineer's Orb","Engineer / 工程"],
+    ["祝福石","Blessed Orb","Bless / 祝福"],
+    ["破裂石","Fracturing Orb","Fracture / 裂石 / 破裂"],
+    ["卡蘭德之觸","Mirror Shard","Mirror Shard / 鏡子碎片"],
+    ["神聖碎片","Divine Shard","Divine Shard / 神聖碎片"],
+    ["喚醒者之石","Awakener's Orb","Awakener / 覺醒石"],
+    ["救贖者之石","Redeemer's Exalted Orb","Redeemer / 救贖石"],
+    ["狩獵者之石","Hunter's Exalted Orb","Hunter / 狩獵石"],
+    ["十字軍之石","Crusader's Exalted Orb","Crusader / 十字軍"],
+    ["督軍之石","Warlord's Exalted Orb","Warlord / 督軍"],
+    ["次級/高階/卓越/無暇古靈燼火","Eldritch Ember","Ember / 紅王通貨"],
+    ["次級/高階/卓越/無暇古靈星海","Eldritch Ichor","Ichor / 藍王通貨"],
+    ["古靈極淨石","Eldritch Orb of Annulment","Eldritch Annul / 古靈剝離"],
+    ["古靈混沌石","Eldritch Chaos Orb","Eldritch Chaos / 古靈混沌"],
+    ["古靈崇高石","Eldritch Exalted Orb","Eldritch Ex / 古靈崇高"],
+    ["銀幣","Silver Coin","Silver / 銀幣"],
+    ["先驅石","Harbinger's Orb","Harbinger / 先驅石"],
+    ["束縛石","Orb of Binding","Binding / 束縛"],
+    ["地平石","Orb of Horizons","Horizon / 地平"],
+    ["古文本","Ancient Orb","Ancient / 古文本"],
+    ["鑑定卷軸","Scroll of Wisdom","Wisdom / 鑑定"],
+    ["傳送卷軸","Portal Scroll","Portal / 傳送"]
+];
+const html = data.map(r => `<tr><td style="color:#fff;font-weight:bold;">${r[0]}</td><td style="color:#999;font-style:italic;">${r[1]}</td><td><span class="tag">${r[2]}</span></td></tr>`).join('');
+document.getElementById('db').innerHTML = html;
+document.getElementById('api').addEventListener('keyup', function() {
+    let f = this.value.toUpperCase();
+    let trs = document.getElementById('db').getElementsByTagName('tr');
+    for (let i = 0; i < trs.length; i++) {
+        trs[i].style.display = trs[i].innerText.toUpperCase().indexOf(f) > -1 ? "" : "none";
+    }
+});
+</script>
+</body>
+</html>

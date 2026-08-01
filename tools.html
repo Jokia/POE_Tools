@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>PoE 10 Advanced Toolkits Dashboard (Bilingual)</title>
+    <style>
+        body { background:#0d0d0d; color:#d1d1d1; font-family:sans-serif; padding:15px; font-size:12px; }
+        .box { max-width:850px; margin:0 auto; background:#141414; padding:20px; border:1px solid #222; border-radius:4px; }
+        .bar { display: flex; justify-content: space-between; align-items: center; border-bottom:1px solid #222; padding-bottom:10px; margin-bottom: 20px; }
+        h1 { color:#e5c158; font-size:18px; margin: 0; }
+        .css-coin { width: 16px; height: 16px; background: linear-gradient(135deg, #ffe066 0%, #e5c158 50%, #b38f00 100%); border-radius: 50%; margin-right: 8px; border: 1px solid #ffe066; position: relative; }
+        .css-coin::after { content: 'T'; position: absolute; font-size: 10px; font-weight: bold; color: #4d3d00; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .nav { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .nav-btn { padding: 4px 12px; background: #222; border: 1px solid #444; color: #fff; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold; }
+        .nav-btn:hover { border-color: #e5c158; color: #e5c158; }
+        .act { background: #e5c158; color: #111; border-color: #ffe066; }
+        .card { background: #1a1a1a; border: 1px solid #2d2d2d; border-radius: 4px; padding: 12px 15px; margin-bottom: 12px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        .card-title { color: #e5c158; font-weight: bold; font-size: 13px; }
+        .badge-core { background: #1f4068; color: #fff; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; }
+        .badge-adv { background: #1b4332; color: #52b788; border: 1px solid #2d6a4f; padding: 2px 6px; border-radius: 3px; font-size: 10px; font-weight: bold; }
+        .card-body { display: none; margin-top: 10px; line-height: 1.6; color: #b5b5b5; }
+        ul { padding-left: 15px; margin: 6px 0; }
+        li { margin-bottom: 4px; }
+        .hl-key { color: #e5c158; font-weight: bold; }
+        code { background: #000; color: #ff7b72; padding: 1px 4px; font-family: monospace; border-radius: 3px; font-size: 11px; }
+        .url-box { background: #0d1b2a; border: 1px solid #1b4332; border-radius: 4px; padding: 8px 10px; margin-top: 10px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 11px; }
+        .url-title { color: #52b788; font-weight: bold; }
+        .poe-link { color: #4da6ff; text-decoration: none; font-weight: bold; border-bottom: 1px dashed #4da6ff; }
+        .poe-link:hover { color: #85c1e9; border-bottom-style: solid; }
+    </style>
+</head>
+<body>
+<div class="box">
+    <div class="bar">
+        <div style="display:flex;align-items:center;"><div class="css-coin"></div><h1 id="ui_title">PoE 高階外部輔助工具箱</h1></div>
+        <div class="btn-group">
+            <button id="b_zh" class="nav-btn act" onclick="setL('zh')">繁體中文</button>
+            <button id="b_en" class="nav-btn" onclick="setL('en')">English</button>
+        </div>
+    </div>
+    <div class="nav">
+        <button class="nav-btn" onclick="tglAll(true)"><span id="ui_exp">展開全部說明</span></button>
+        <button class="nav-btn" onclick="tglAll(false)"><span id="ui_col">折疊全部卡片</span></button>
+    </div>
+    <div id="toolsContainer"></div>
+</div>
+
+<script>
+let lang = localStorage.getItem('poe_tl_lang') || 'zh';
+const uiText = {
+    zh: { t: "Path of Exile 10大高階外部黑科技工具箱", exp: "📜 展開全部說明", col: "🔒 折疊全部卡片", core: "常備核心", adv: "進階拓荒", dir: "🔗 官方直達：" },
+    en: { t: "Path of Exile: 10 Advanced External Core Toolkits Portfolio", exp: "📜 Expand All Manuals", col: "🔒 Collapse All Cards", core: "Baseline", adv: "Endgame", dir: "🔗 Official Link: " }
+};
+
+// 💡【第二步】請把第二步全繁體化的 db 數據矩陣完整複製粘貼在下方：
+const db = [
+    {
+        id: "overlay", isAdv: false, url_name: "PoE Overlay Official Github Releases Hub", url: "https://github.com/PoE-Overlay-Community/PoE-Overlay-Community-Fork",
+        t_zh: "① 遊戲內懸停即時估價神器：PoE Overlay (社區分支版)", t_en: "① In-Game Instant Price Checker: PoE Overlay (Community Fork)",
+        d_zh: "滑鼠懸停未鑑定、稀有黃色或上傳奇暗金物品，一鍵 Ctrl + D 瞬間在遊戲內彈窗拉取全服最新價格。",
+        d_en: "Hover over any unidentified, rare yellow, or unique item and press Ctrl + D to instantly fetch real-time market data in-game.",
+        b_zh: ["詳細實戰：遊戲內將顯示調整为窗口化全螢幕。滑鼠懸停在物品上，按下 Ctrl + D。","避坑心得：彈窗內會高亮標出該裝備當前詞綴的變量在市集中的價格。如果處於頂格狀態說明是極品滿變，價格極高！"],
+        b_en: ["Setup: Set your client display mode to Windowed Fullscreen. Hover your cursor over the loot and hit Ctrl+D.","Pro Tips: Abuse the variable distribution chart inside the pop-up panel to check roll stats, preventing scamming."]
+    },
+    {
+        id: "pob", isAdv: false, url_name: "Path of Building (Community Edition) Setup Base", url: "https://github.com/PathOfBuildingCommunity/PathOfBuilding",
+        t_zh: "② 大神配裝與真實傷害模擬器：Path of Building (PoB社區版)", t_en: "② Theorycrafting & True DPS Simulator: Path of Building",
+        d_zh: "流放之路唯一的、最權威的、能計算真實一刀傷害的配裝模擬軟體。遊戲內面板 DPS 非常弱智，而 PoB 才是靈魂核心。",
+        d_en: "The only authorized and definitive build simulator for PoE. In-game tooltip DPS is heavily flawed; PoB is the absolute soul of endgame scaling.",
+        b_zh: ["詳細實戰：複製大神的 pobb.in 連結，打開 PoB 軟體點擊 Import 貼上，即可一秒還原大神的全部配置。","避坑心得：能一鍵導入您自己線上開荒的角色面板，進行全方位傷害體檢，透視出更換哪一件裝備增傷最高。"],
+        b_en: ["Setup: Copy any pobb.in link from pro guides, hit Import button, and replicate their 240-node tree and gem links in 1 second.","Pro Tips: Import your own online profile to test if your flat P-DPS weapon or missing jewel nodes are bottlenecking your damage."]
+    },
+    {
+        id: "poelab", isAdv: false, url_name: "PoE Lab Official Layout Compass Board", url: "https://poelab.com",
+        t_zh: "③ 帝王迷宮跑圖天天看常駐看板：PoE Lab", t_en: "③ Daily Ascendancy Labyrinth Navigator: PoE Lab",
+        d_zh: "每日人肉探路更新。為您畫出今天普通、殘酷、無情、以及終極帝王迷宮的最快跑圖連線、捷徑與鑰匙房位置。",
+        d_en: "Human-scouted daily updates illustrating the fastest pathways, puzzle shortcuts, Argus locations, and Golden Key checkpoints for all 4 Lab Tiers.",
+        b_zh: ["詳細實戰：每天跑迷宮拿升華點前，先在瀏覽器打開此網站，對照大牛的人肉探路圖去跑遊戲。","避坑心得：看圖跑迷宮原本極易迷路的通關過程可以被壓縮到 5分鐘以內，免去死亡後門票打水漂的痛苦。"],
+        b_en: ["Setup: Pre-screen the layout map on a secondary monitor before entering. Shave your run down to under 5 minutes.","Pro Tips: Track darkshrine buffs and extra gauntlet key chest checkpoints efficiently to maximize currency gains."]
+    },
+    {
+        id: "ninja", isAdv: false, url_name: "PoE Ninja Official Economy Index Dashboard", url: "https://poe.ninja",
+        t_zh: "④ 流放全服物價股市圖與天梯榜單：PoE Ninja", t_en: "④ Economy Index & Leaderboard Tracker: PoE Ninja",
+        d_zh: "通貨、聖甲蟲、暗金裝備、命運卡、極品珠寶價格即時波動走向監控。全遊戲最龐大的全服經濟晴雨表。",
+        d_en: "Real-time market valuation monitoring for currency stocks, scarabs, uniques, and divination cards. The ultimate economy dashboard.",
+        b_zh: ["詳細實戰：左側一目了然地列出了所有通貨的升貶值走勢圖。點擊頂部的 Builds 可直接查看全服頂尖高手的名單。","避坑心得：開荒第一週末尾直接篩選大佬配裝，跟著全服等級最高、最爆肝的這批人買裝備，少走彎路。"],
+        b_en: ["Setup: Examine currency exchange rate curves (Divine to Chaos metrics) across early league milestones.","Pro Tips: Abuse the 'Builds' tab on top to see exactly what gear the top 1000 level-pushing players are running."]
+    },
+    {
+        id: "trader", isAdv: true, url_name: "Chaos Recipe Trader Official Github Releases Hub", url: "https://github.com/ChaosRecipeEnhancer/ChaosRecipeEnhancer",
+        t_zh: "⑤ 賽季初開荒白嫖C幣撿漏宏：Chaos Recipe Trader", t_en: "⑤ Early-League Raw Chaos Farmer: Chaos Recipe Trader",
+        d_zh: "自動追蹤並計數未鑑定黃裝配方。當攢齊一整套後，工具會自動在倉庫裡用紅框發光高亮標註對應位置。",
+        d_en: "A floating overlay that tracks unidentified item sets (item levels 60-74) and auto-highlights full sets in your stash via glowing red frames.",
+        b_zh: ["詳細實戰：開荒前兩天在低級地圖過度期，地面掉落的 60-74 級黃色稀有裝備別鑑定，利用這個宏自動計數。","避坑心得：攢齊一兩套後一鍵讓倉庫發光，按著 Ctrl 鍵無腦點一圈去商店換 2C，一小時能無腦平穩白嫖 50C 資金。"],
+        b_en: ["Setup: No thinking required. Mass-click the highlighted grid slots, sell to the vendor, and get 2x Raw Chaos Orbs instantly.","Pro Tips: Farm 40~60C per hour in low-tier maps within the first 48 hours of league start to secure your progression weapons."]
+    },
+    {
+        id: "better", isAdv: true, url_name: "Edge Addons Store - PoE Better Trading Portal", url: "https://microsoftedge.microsoft.com/addons/detail/better-pathofexile-tradin/lhkfkbpgmakhakadnefmpimeincnekfn",
+        t_zh: "⑥ 官方市集批量免切屏秒掃貨外掛程式：PoE Better Trading", t_en: "⑥ Official Trade Site Mass Bulk Purchaser: PoE Better Trading",
+        d_zh: "安裝在 Edge 瀏覽器上的官方市集擴充增強外掛程式。徹底終結批量購買物品時的切屏地獄。",
+        d_en: "An Edge extension that permanently terminates the Alt + Tab screen-switching hell when buying bulk maps or scarabs.",
+        b_zh: ["詳細實戰：在 Edge 商店裡安裝這個市集擴充。可以把你每天都要高頻批量採購的特定裝備底子或詞綴一鍵收藏分組。","避坑心得：網頁端點擊購買後，買賣暗號會直接在后台自動發進遊戲用戶端並替你發出去！你完全不需要動鍵盤。"],
+        b_en: ["Setup: Bookmark your daily bulk buy filters (specific item bases or exact scarab layouts) on the official trade site for instant loading.","Pro Tips: Spam click buy buttons on your browser; the extension silently fires whisper strings directly into your game client chat panel."]
+    },
+    {
+        id: "analytics", isAdv: true, badge: "Bulk Gold", url_name: "PoE Ninja Builds Leaderboard & Analytics Panel", url: "https://poe.ninja/poe1/builds/streamers",
+        t_zh: "⑦ 終極配裝風向標與大傷大數據拆解：PoE Ninja Builds Analytics", t_en: "⑦ Meta Metrical Reverse Engineering Panel: PoE Ninja Builds Analytics",
+        d_zh: "隱藏在 PoE Ninja 官方 Builds 天梯榜左側的頂級分析功能。進行熱度逆向拆解。",
+        d_en: "The hidden statistics page on the left side of official PoE Ninja builds. It compiles big-data metrics of the top 1000 players.",
+        b_zh: ["詳細實戰：左側篩選你的技能，頁面會直接以柱狀圖與餅圖形式，統計出當前排名前1000的高手中有多少比重連了核心寶石。","避坑心得：能一鍵透視出大佬們身上選用的前三項增傷權重，讓你直接站在高手肩膀上做裝備，絕不花冤枉錢。"],
+        b_en: ["Setup: View precise pie charts tracking exactly what percentage of top Chieftains link Overexertion Support.","Pro Tips: Check high-frequency jewel modifiers picked by top-tier end-game racers, ensuring zero wasted investments when re-gearing."]
+    },
+    {
+        id: "filterblade", isAdv: true, url_name: "FilterBlade Official Direct Cloud Sync Portal", url: "https://github.com/NeverSinkDev/FilterBlade-Public-Assets",
+        t_zh: "⑧ 過濾代碼網頁一鍵無感同步：FilterBlade Auto-Sync", t_en: "⑧ On-the-Fly Direct Loot Filter Synchronizer: FilterBlade Auto-Sync",
+        d_zh: "網頁端微調過濾器後一鍵雲端線上同步，遊戲內秒刷新，徹底告別每次都重複下載設定檔的繁瑣流程。",
+        d_en: "Tweak loot highlight rules on the website and sync instantly with your in-game client without manually downloading .filter files.",
+        b_zh: ["詳細實戰：在網站內登錄授權。微調規則後，在右側點擊 Save -> Sync with Game。","避坑心得：回到遊戲內按 Esc 進設置 -> 遊戲選項 -> 過濾器旁點擊小刷新圖標。剛才網頁上的改動會被遊戲一秒鐘線上讀取！"],
+        b_en: ["Setup: Log in via your official PoE profile on FilterBlade. Tweak your sorting rules, then hit Save -> Sync with Game.","Pro Tips: In-game, press Esc -> Options -> UI, hit the refresh icon next to your sync slot. The new filter goes live instantly."]
+    },
+    {
+        id: "mapwatch", isAdv: true, url_name: "Mapwatch Official Local Log File Parser Running Page", url: "https://github.com",
+        t_zh: "⑨ 純本地刷圖效率與掛機發呆清算器：Mapwatch", t_en: "⑨ Mapping Efficiency & Hideout Idle Analyzer: Mapwatch",
+        d_zh: "純本地運行，透過靜默讀取遊戲日誌自動分析你每張異界地圖刷了多少秒，精確清算你在藏身處掛機發呆浪費了多少時間。",
+        d_en: "A pure client-side tracker that reads your game logs to parse exactly how many seconds you take per map and how long you spend idling.",
+        b_zh: [
+            "詳細實战：下線前打開網頁，把遊戲根目錄 Logs 文件夾下的 Client.txt 日誌文件往網頁裡一拖。",
+            "避坑心得：它會以柱狀圖告訴你發呆整理的總時長，幫你極限壓榨下賽季的開荒內卷效率。Hideout is lava！",
+            "更新: TraXile 独立客户端版(功能更强大的平替)。目前社区主流的图表与效率统计工具。它不仅能离线读取日志分析历史数据，还自带游戏内悬浮窗 (Overlay)，在你刷图时实时显示计时器，并统计夺宝（Heist）、圣所（Sanctum）等各种机制的刷图收益。<a href='https://github.com/dermow/Traxile' class='poe-link' target='_blank'>TraXile</a>"
+        ],
+        b_en: [
+            "Setup: Remember: 'Hideout is lava'. Drag your game's Client.txt log file directly into this webpage under logs directory.",
+            "Pro Tips: It charts clear data breakdown tracking your active clearing vs. passive idling time, forcing you to drastically cut down town time.",
+            "Update: TraXile Standalone Client (A more powerful alternative). Currently the mainstream community chart and efficiency tracking tool. It not only parses historical data offline by reading game logs, but also features an in-game Overlay that displays a real-time mapping timer and tracks your farming returns from various mechanics like Heist, Sanctum, and more. <a href='https://github.com/dermow/Traxile' class='poe-link' target='_blank'>TraXile</a>" // 👈 【新增英文行】英文内部同样使用了安全的单引号 ''
+        ]
+    },
+    {
+        id: "craft", isAdv: true, url_name: "Craft of Exile Official Endgame Crafting Simulator Hub", url: "https://craftofexile.com",
+        t_zh: "⑩ 全遊戲唯一的純手工做裝大聖經：Craft of Exile", t_en: "⑩ Endgame Crafting Big Data Matrix Simulator: Craft of Exile",
+        d_zh: "全遊戲最權威的手工做裝模擬聖經。在你花任何一分錢去遊戲裡點石頭前，在網頁上完全模擬出你的畢業大斧應該怎麼做最省錢。",
+        d_en: "The absolute crafting bible. Simulate currency spamming, fossil crafting, or eldritch alterations before spending a single orb in-game.",
+        b_zh: ["詳細實戰：進入網站選擇底子。在 Simulator 模組裡，你可以模擬對其進行點金、重鑄、或高階化石化合製作。","避坑心得：它會用大數據公式精準告訴你：你平均需要花費多少成本就能穩穩摸到極品物理詞綴。先來這模擬，能幫你省下成噸的 Divine！"],
+        b_en: ["Setup: Select your item type, level requirements, and base mod pools. Reroll items inside the Simulator module for zero real currency cost.","Pro Tips: The system calculates the exact statistical odds (e.g., 'Average 45 Alchs needed for Tier 1 Phys Mod'), saving you massive raw Divine investments."]
+    }
+];
+
+function render() {
+    const u = uiText[lang];
+    document.getElementById('ui_title').innerText = u.t;
+    document.getElementById('ui_exp').innerText = u.exp;
+    document.getElementById('ui_col').innerText = u.col;
+    document.getElementById('b_zh').className = "nav-btn" + (lang === 'zh' ? " act" : "");
+    document.getElementById('b_en').className = "nav-btn" + (lang === 'en' ? " act" : "");
+
+    document.getElementById('toolsContainer').innerHTML = db.map(item => `
+        <div class="card">
+            <div class="card-header" onclick="tgl('${item.id}')">
+                <span class="card-title">${lang === 'zh' ? item.t_zh : item.t_en}</span>
+                <span class="${item.isAdv ? 'badge-adv' : 'badge-core'}">${item.isAdv ? u.adv : u.core}</span>
+            </div>
+            <div class="card-body" id="b_${item.id}">
+                <p><b>🔍 ${lang === 'zh' ? '一句話簡介' : 'Summary'}:</b> ${lang === 'zh' ? item.d_zh : item.d_en}</p>
+                <ul>${(lang === 'zh' ? item.b_zh : item.b_en).map(b => `<li>${b}</li>`).join('')}</ul>
+                <div class="url-box">
+                    <span class="url-title">${u.dir}</span>
+                    <a href="${item.url}" class="poe-link" target="_blank">${item.url_name}</a>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    run();
+}
+
+function run() {
+    db.forEach(item => {
+        const el = document.getElementById('b_' + item.id);
+        const saved = localStorage.getItem('poe_tl_v_' + item.id);
+        if (saved === '1' || (saved === null && (item.id === 'overlay' || item.id === 'pob'))) {
+            el.style.display = 'block';
+        } else {
+            el.style.display = 'none';
+        }
+    });
+}
+
+function tgl(k) {
+    const el = document.getElementById('b_' + k);
+    const visible = el.style.display === 'block';
+    el.style.display = visible ? 'none' : 'block';
+    localStorage.setItem('poe_tl_v_' + k, visible ? '0' : '1');
+}
+
+function tglAll(show) {
+    db.forEach(item => {
+        document.getElementById('b_' + item.id).style.display = show ? 'block' : 'none';
+        localStorage.setItem('poe_tl_v_' + item.id, show ? '1' : '0');
+    });
+}
+
+function setL(l) { lang = l; localStorage.setItem('poe_tl_lang', l); render(); }
+window.onload = function() { render(); }
+</script>
+</body>
+</html>
+
