@@ -104,7 +104,7 @@ This portfolio is a **pure client-side, zero-dependency, and local-secure** tool
 
 ---
 
-*Good luck on your next league launch! May your Atlas stay connected and a Mirror of Kalandra drop for you soon! ⚔本地*
+*Good luck on your next league launch! May your Atlas stay connected and a Mirror of Kalandra drop for you soon! ⚔*
 
 <br>
 <p align="right"><b><a href="#🧭-path-of-exile-異界速通拓荒與高階輔助全能軍火庫--endgame-toolkit-portfolio-">⬆️ Back to Top</a></b></p>
