@@ -12,7 +12,7 @@
 
 這是一個專為《流失之路》（Path of Exile）開荒拓荒、進階理財與大倉管理打造的**純前端、零依賴、純本地安全運行**的免登入工具箱。完美復刻 PoE 經典暗黑視覺風格，完美適配 Edge/Chrome 瀏覽器，且自帶 `localStorage` 本地自動存盤暫存功能。
 
-> 🚀 **線上直達個人軍火庫站：** `https://github.io/Jokia/POE_Tools`  
+> 🚀 **線上直達個人軍火庫站：** [POE_Tools](https://jokia.github.io/POE_Tools/)
 
 ### 1. 🧭 異界圖鑑速通逃課指南 (`index.html`)
 * **降維打擊：** 開荒初期利用低价买来的高物理 DPS 武器打破等級壓制與命中率限制。
@@ -64,7 +64,7 @@
 
 This portfolio is a **pure client-side, zero-dependency, and local-secure** toolkit designed for Path of Exile league-starting, net worth tracking, and stash management. Replicating the classic PoE dark theme, it perfectly accommodates Edge/Chrome browsers with localized automatic `localhost` caching persistence.
 
-> 🚀 **Live Deployment Website:** `https://github.io/Jokia/POE_Tools`  
+> 🚀 **Live Deployment Website:** [POE_Tools](https://jokia.github.io/POE_Tools/)  
 
 ### 1. 🧭 Atlas Progression Cheese Guide (`index.html`)
 * **League Start Strategy:** Learn how to abuse the Atlas progression catch-up mechanic. By completing a single **Rare T10 Map**, you instantly unlock bonus objectives for all lower tiers, skipping the tedious low-tier grind entirely!
