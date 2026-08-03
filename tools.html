@@ -199,9 +199,28 @@ function tglAll(show) {
     });
 }
 
-function setL(l) { lang = l; localStorage.setItem('poe_tl_lang', l); render(); }
-window.onload = function() { render(); }
+// 🟢 終極修復：對齊全局事件總線的 tools 語言切換函數
+function setL(l) { 
+    lang = l; 
+    // 1. 統一寫入全局唯一的公共語言快取鍵名
+    localStorage.setItem('poe_global_lang', l); 
+    localStorage.setItem('poe_tl_lang', l); // 保持你原本舊代碼的相容性
+    
+    // 2. 向最上方的 nav.js 導航組件發射變字訊號
+    window.dispatchEvent(new Event('poe_lang_changed'));
+    
+    // 3. 觸發你原本寫好的 render 函數，重新繪製你自己的長文案
+    render(); 
+}
+
+window.onload = function() { 
+    // 4. 初始化加載時，優先順著全局公共語言快取來識別（確保跨頁面切換時語系全球統一）
+    lang = localStorage.getItem('poe_global_lang') || localStorage.getItem('poe_tl_lang') || 'zh';
+    
+    // 5. 執行你原本的渲染邏輯
+    render(); 
+}
+
 </script>
 </body>
 </html>
-

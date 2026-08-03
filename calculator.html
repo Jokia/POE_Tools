@@ -8,18 +8,15 @@
         body { background:#0d0d0d; color:#d1d1d1; font-family:sans-serif; padding:15px; font-size:12px; }
         .box { max-width:800px; margin:0 auto; background:#141414; padding:20px; border:1px solid #222; border-radius:4px; }
         
-        /* 標題欄容器（整合多語言按鈕） */
+        /* 標題欄容器 */
         .title-container { display: flex; align-items: center; border-bottom:1px solid #222; padding-bottom:10px; margin-bottom: 15px; margin-top: 15px; }
         h1 { color:#e5c158; font-size:18px; margin: 0; flex-grow: 1; text-align: left; }
         .css-coin { width: 16px; height: 16px; background: linear-gradient(135deg, #ffe066 0%, #e5c158 50%, #b38f00 100%); border-radius: 50%; margin-right: 8px; border: 1px solid #ffe066; position: relative; flex-shrink: 0; }
         .css-coin::after { content: '$'; position: absolute; font-size: 10px; font-weight: bold; color: #4d3d00; top: 50%; left: 50%; transform: translate(-50%, -50%); }
         
-        /* 標題欄右側的多語言按鈕樣式 */
+        /* 多語言按鈕 */
         .lang-container { display: flex; gap: 5px; flex-shrink: 0; }
-        .lang-btn {
-            background: #111; color: #888; border: 1px solid #2a2a2a; padding: 4px 10px;
-            font-size: 11px; border-radius: 3px; cursor: pointer; transition: all 0.2s;
-        }
+        .lang-btn { background: #111; color: #888; border: 1px solid #2a2a2a; padding: 4px 10px; font-size: 11px; border-radius: 3px; cursor: pointer; transition: all 0.2s; }
         .lang-btn:hover { color: #ffe066; border-color: #ffe066; }
         .lang-btn.active { color: #e5c158; background: #262111; border-color: #e5c158; font-weight: bold; box-shadow: 0 0 4px rgba(229, 193, 88, 0.3); }
 
@@ -28,29 +25,36 @@
         .rate-grid { display: flex; flex-wrap: wrap; gap: 12px; }
         .rate-input { width: 55px; padding: 3px; background: #050505; border: 1px solid #444; color: #e5c158; text-align: center; font-weight: bold; }
         
-        /* 身價結果區塊 */
+        /* 精簡瘦身版拖拽日誌區域 */
+        .drop-zone { border: 2px dashed #38608f; background: #11141a; padding: 15px; text-align: center; border-radius: 4px; margin-bottom: 15px; cursor: pointer; transition: all 0.2s; }
+        .drop-zone:hover { border-color: #e5c158; background: #161b24; }
+        .log-out { margin-top: 12px; background: #0a0e14; border: 1px solid #222; padding: 10px; border-radius: 3px; text-align: left; font-family: monospace; line-height: 1.6; color: #d1d1d1; }
+
+        /* 行內摺疊路徑按鈕與面板 */
+        .path-toggle-btn { background: #222; color: #e5c158; border: 1px solid #444; padding: 2px 8px; font-size: 10px; border-radius: 3px; cursor: pointer; margin-left: 5px; font-weight: bold; transition: all 0.2s; display: inline-block; vertical-align: middle; }
+        .path-toggle-btn:hover { background: #262111; border-color: #e5c158; box-shadow: 0 0 3px rgba(229, 193, 88, 0.4); }
+        .path-content-panel { display: none; margin-top: 8px; background: #0d1117; border: 1px dashed #2d4563; padding: 10px; border-radius: 4px; color: #888; font-size: 10px; text-align: left; line-height: 1.6; }
+        .path-content-panel code { background: #000; color: #ff7b72; padding: 1px 3px; font-family: monospace; border-radius: 2px; }
+
+        /* 身價看板與網格 */
         .result-panel { background: #1c1303; border: 1px solid #e5c158; padding: 12px; margin-bottom: 15px; text-align: center; border-radius: 4px; }
         .result-value { font-size: 22px; font-weight: bold; color: #fff; }
-        
-        /* 通貨卡片網格 */
         .currency-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; margin-bottom: 15px; }
         .currency-card { background: #1c1c1c; border: 1px solid #2d2d2d; padding: 8px; border-radius: 4px; display: flex; align-items: center; justify-content: space-between; }
-		/* 新增：强行让卡片文字内容在任何情况下都绝对左对齐 */
         .card-text-box { display: flex; flex-direction: column; text-align: left; align-items: flex-start; }
         .count-input { width: 70px; padding: 4px; background: #090909; border: 1px solid #333; color: #fff; text-align: right; font-weight: bold; }
         
-        .clear-btn { display: block; width: 100px; margin: 0 auto; padding: 6px; background: #311; border: 1px solid #522; color: #f66; cursor: pointer; font-weight: bold; border-radius: 3px; transition: background 0.2s; }
-        .clear-btn:hover { background: #522; }
+        .clear-btn { display: block; width: 100px; margin: 0 auto; padding: 6px; background: #311; border: 1px solid #522; color: #f66; cursor: pointer; font-weight: bold; border-radius: 3px; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type="number"] { -moz-appearance: textfield; }
     </style>
 </head>
 <body>
 <div class="box">
-    <!-- 全局導航欄组件 -->
+    <!-- 全局導航欄組件 -->
     <div id="global-nav"></div>
     
-    <!-- 標題欄容器（整合多語言切換按鈕） -->
+    <!-- 標題欄容器 -->
     <div class="title-container">
         <div class="css-coin"></div>
         <h1 id="ui_main_title">Path of Exile 動態市價身價自動計算器</h1>
@@ -60,27 +64,37 @@
         </div>
     </div>
     
-    <!-- 匯率修改面板 -->
+    <!-- 匯率微調面板 -->
     <div class="rate-panel">
         <div id="ui_rate_title" style="color:#e5c158; font-weight:bold; margin-bottom:8px;">⚙️ 即時市場匯率微調面板 (單位：Chaos)</div>
+        <!-- 🟢 核心修復：為前置文字補齊 id，以便 JS 能夠精準捕捉並即時變字 -->
         <div class="rate-grid">
-            <!-- 已將原本錯誤的 calc() 修正為安全的 saveAndCalc() -->
-            <div>1 Divine = <input type="number" id="r_div" class="rate-input" value="150" oninput="saveAndCalc()"> C</div>
-            <div>1 崇高石 = <input type="number" id="r_ex" class="rate-input" value="10" oninput="saveAndCalc()"> C</div>
-            <div>1 破裂石 = <input type="number" id="r_frac" class="rate-input" value="4500" oninput="saveAndCalc()"> C</div>
-            <div>1 淨化石 = <input type="number" id="r_annul" class="rate-input" value="3" oninput="saveAndCalc()"> C</div>
-            <div>1 連結石 = <input type="number" id="r_fuse" class="rate-input" value="0.3" oninput="saveAndCalc()"> C</div>
-            <div>1 改造石 = <input type="number" id="r_alt" class="rate-input" value="0.15" oninput="saveAndCalc()"> C</div>
+            <div><span id="lbl_div">1 Divine = </span><input type="number" id="r_div" class="rate-input" value="150" oninput="saveAndCalc()"> C</div>
+            <div><span id="lbl_ex">1 崇高石 = </span><input type="number" id="r_ex" class="rate-input" value="10" oninput="saveAndCalc()"> C</div>
+            <div><span id="lbl_frac">1 破裂石 = </span><input type="number" id="r_frac" class="rate-input" value="4500" oninput="saveAndCalc()"> C</div>
+            <div><span id="lbl_annul">1 淨化石 = </span><input type="number" id="r_annul" class="rate-input" value="3" oninput="saveAndCalc()"> C</div>
+            <div><span id="lbl_fuse">1 連結石 = </span><input type="number" id="r_fuse" class="rate-input" value="0.3" oninput="saveAndCalc()"> C</div>
+            <div><span id="lbl_alt">1 改造石 = </span><input type="number" id="r_alt" class="rate-input" value="0.15" oninput="saveAndCalc()"> C</div>
         </div>
     </div>
-	
-	<!-- 新增：極簡使用說明掛件 -->
-    <div id="ui_help_box" style="background: #141b24; border: 1px dashed #38608f; padding: 10px; margin-bottom: 15px; border-radius: 4px; line-height: 1.6; font-size: 11px; color: #a3c2e6;">
-        <!-- 這裡的文字會由下方的 JS 字典自動化即時控制切換 -->
+
+    <!-- 🌟 精簡瘦身版：一鍵日誌拖拽效益清算面板（按鈕與文字完美同航） -->
+    <div class="drop-zone" id="log-drop-zone">
+        <div id="ui_drop_tips" style="color: #a3c2e6; font-size: 11px; font-weight: bold; text-align: center;">
+            <span id="ui_drop_text">📊 <b>一鍵效益清算：請將遊戲根目錄下 Logs/Client.txt 日誌文件拖拽至此處</b></span>
+            <button class="path-toggle-btn" id="ui_path_btn" onclick="tglPath(); event.stopPropagation();">📁 點擊展開路徑參考</button>
+            <div id="path-panel" class="path-content-panel" onclick="event.stopPropagation();">
+                💡 <b>常見客戶端默認日誌路徑參考：</b><br>
+                • <b>Steam 國際服 / 台服：</b> <code>C:\Program Files (x86)\Steam\steamapps\common\Path of Exile\Logs\Client.txt</code><br>
+                • <b>官方獨立客戶端 (國際服)：</b> <code>C:\Program Files\Grinding Gear Games\Path of Exile\Logs\Client.txt</code><br>
+                • <b>騰訊國服客戶端：</b> <code>C:\Program Files (x86)\WeGameApps\英雄联盟/流放之路\Logs\Client.txt</code>
+            </div>
+        </div>
+        <div id="log-result" class="log-out" style="display: none;"></div>
     </div>
 
-    <!-- 收益統計看板 -->
-    <div class="result-panel">
+    <!-- 即時搬運指南 -->
+    <div id="ui_help_box" style="background: #141b24; border: 1px dashed #38608f; padding: 10px; margin-bottom: 15px; border-radius: 4px; line-height: 1.6; font-size: 11px; color: #a3c2e6;"></div>
 
     <!-- 收益統計看板 -->
     <div class="result-panel">
@@ -89,38 +103,64 @@
         <div style="color:#aaa; font-size:11px;" id="resChaos">等值於 0 Chaos</div>
     </div>
 
-    <!-- 卡片插槽 -->
     <div class="currency-grid" id="grid"></div>
     <button class="clear-btn" id="ui_clear_btn" onclick="cls()">一鍵清空</button>
 </div>
 <script>
 let lang = localStorage.getItem('poe_calc_lang') || 'zh';
 
-// 多語言靜態文本字典（已整合 Ninja 匯率手動輸入指南）
 const uiText = {
     zh: {
         title: "PoE 自動存檔身價動態計算器",
         mainTitle: "Path of Exile 動態市價身價自動計算器",
-        rateTitle: "⚙️ 即時市場匯率微調面板 (單位：Chaos)",
+        rateTitle: "⚙️ 即時市場匯率微調面板 (單位：Chaos)", // 👈 保持中文
         netWorth: "💰 您的資產總價值估算 (Net Worth) 💰",
         clearBtn: "一鍵清空",
         chaosUnit: " 等值於 ",
         chaosSuffix: " Chaos",
-        helpHtml: `💡 <b>身價盤點指南：</b>建議在開始計算前，先手動打開 <b>poe.ninja</b> 網站，查看當前賽季最新的通貨匯率。然後在上方微調面板中修改對應的 Chaos 數值（如 1 Div 換多少 C），下方輸入框就會全自動幫您即時跨通貨精算。數據會安全留存於本地，免去每次重複輸入的煩惱！`
+        dropTips: "📊 <b>一鍵效益清算：請將遊戲根目錄下 Logs/Client.txt 日誌文件拖拽至此處</b>",
+        loadingLog: "⏳ 正在高性能分析本地日誌（僅條帶掃描末尾50MB），請稍候...",
+        errLog: "❌ 錯誤：請務必拖入正確的遊戲日誌文件 Client.txt！",
+        noRun: "⚠️ 最近的日誌中未檢測到完整的法陣/聖所刷圖記錄。",
+        btnPathShow: "📁 點擊展開路徑參考",
+        btnPathHide: "📁 摺疊隱藏路徑參考",
+        // 🆕 新增：路徑面板內部的繁體中文文本
+        pathPanelHtml: `
+            💡 <b>常見客戶端默認日誌路徑參考：</b><br>
+            • <b>Steam 國際服 / 台服：</b> <code>C:\\Program Files (x86)\\Steam\\steamapps\\common\\Path of Exile\\Logs\\Client.txt</code><br>
+            • <b>官方獨立客戶端 (國際服)：</b> <code>C:\\Program Files\\Grinding Gear Games\\Path of Exile\\Logs\\Client.txt</code><br>
+            • <b>騰訊國服客戶端：</b> <code>C:\\Program Files (x86)\\WeGameApps\\英雄联盟/流放之路\\Logs\\Client.txt</code>
+        `,
+        helpHtml: () => `💡 <b>身價盤點指南：</b>建議在開始計算前，先手動打開 <b>poe.ninja</b> 網站，查看當前賽季最新的通貨匯率。然後在上方微調面板中修改對應的 Chaos 數值（如 1 Div 換多少 C），下方輸入框就會全自動幫您即時跨通貨精算。數據會安全留存於本地，免去每次重複輸入的煩惱！`,
+        logResHtml: (runs, min, sec, totalD, dph) => `🚀 <b>日誌清算成功！最近統計結果：</b><br>✨ 累計完成法陣/聖所場次：<b>${runs}</b> 場<br>⏱️ 平均每場通關耗時：<b>${min}分${sec}秒</b><br>💰 預估總收益：<b>${totalD} Divine</b> (以單場 0.5D 基準估算)<br>📊 淨刷圖時薪效率：<span style="color:#ffe066; font-weight:bold;">${dph} Div / 小時</span>`
     },
     en: {
         title: "PoE Automatic Net Worth Calculator",
         mainTitle: "Path of Exile Real-Time Asset & Net Worth Calculator",
-        rateTitle: "⚙️ Market Exchange Rate Tweaker (Unit: Chaos)",
+        rateTitle: "⚙️ Market Exchange Rate Tweaker (Unit: Chaos)", // 👈 🆕 新增：微調面板標題英文翻譯
         netWorth: "💰 Your Estimated Net Worth 💰",
         clearBtn: "Clear All",
         chaosUnit: " Equivalent to ",
         chaosSuffix: " Chaos",
-        helpHtml: `💡 <b>Quick Guide:</b> Before calculating, it is highly recommended to open <b>poe.ninja</b> to check the latest economy rates for the current league. Manually update the Chaos values in the tweaker panel above (e.g., Divine price), and the grid below will instantly auto-calculate your total asset value. All quantities and custom rates are saved locally.`
+        dropTips: "📊 <b>One-Click Analytics: Drag & Drop your game's Logs/Client.txt here</b>",
+        loadingLog: "⏳ Analyzing local log chunks stream (last 50MB only), please wait...",
+        errLog: "❌ Error: Please drag and drop the authentic game log file named 'Client.txt'!",
+        noRun: "⚠️ No complete Sanctum/Mapping run sequence detected in recent log tracks.",
+        btnPathShow: "📁 Show Default Paths",
+        btnPathHide: "📁 Hide Default Paths",
+        // 🆕 新增：路徑面板內部的英文文本
+        pathPanelHtml: `
+            💡 <b>Common Default Client Log Paths:</b><br>
+            • <b>Steam (Global / TW):</b> <code>C:\\Program Files (x86)\\Steam\\steamapps\\common\\Path of Exile\\Logs\\Client.txt</code><br>
+            • <b>Standalone Client (Global):</b> <code>C:\\Program Files\\Grinding Gear Games\\Path of Exile\\Logs\\Client.txt</code><br>
+            • <b>Tencent CN Client:</b> <code>C:\\Program Files (x86)\\WeGameApps\\Path of Exile\\Logs\\Client.txt</code>
+        `,
+        helpHtml: () => `💡 <b>Quick Guide:</b> Before calculating, it is highly recommended to open <b>poe.ninja</b> to check the latest economy rates for the current league. Manually update the Chaos values in the tweaker panel above (e.g., Divine price), and the grid below will instantly auto-calculate your total asset value. All quantities and custom rates are saved locally.`,
+        logResHtml: (runs, min, sec, totalD, dph) => `🚀 <b>Log Parsing Complete! Recent Analytics:</b><br>✨ Total Completed Runs: <b>${runs}</b> runs<br>⏱️ Average Clear Time: <b>${min}m ${sec}s</b><br>💰 Est. Total Returns: <b>${totalD} Divine</b> (Based on 0.5D/run baseline)<br>📊 Mapping Speed / Efficiency: <span style="color:#ffe066; font-weight:bold;">${dph} Div / hr</span>`
     }
 };
 
-// 37種全通貨滿血版數據庫：[ID, 中文顯示名, 英文顯示名, 匯率獲取函數]
+// 2. 37種全通貨滿血版數據庫 [唯一ID, 中文顯示名, 英文顯示名, 匯率函數]
 const list = [
     ["divine", "神聖石", "Divine Orb", () => parseFloat(document.getElementById('r_div').value) || 0],
     ["chaos", "混沌石", "Chaos Orb", () => 1],
@@ -161,7 +201,7 @@ const list = [
     ["portal", "傳送卷軸", "Portal Scroll", () => 0.01]
 ];
 
-// 動態渲染通貨卡片網格 (已加入 .card-text-box 確保中英文名字完美左對齊)
+// 3. 網格動態生成
 function renderGrid() {
     document.getElementById('grid').innerHTML = list.map(item => `
         <div class="currency-card">
@@ -174,16 +214,14 @@ function renderGrid() {
     `).join('');
 }
 
-// 核心計算與即時自動儲存邏輯（已做浮點數精度優化）
+// 4. 核心計算與即時自動儲存邏輯
 function saveAndCalc() {
     let cTotal = 0;
     const dRate = parseFloat(document.getElementById('r_div').value) || 150;
     
-    // 儲存當前微調面板的匯率
     const rates = ["div", "ex", "frac", "annul", "fuse", "alt"];
     rates.forEach(r => localStorage.setItem("poe_r_" + r, document.getElementById("r_" + r).value));
 
-    // 計算總 Chaos 身價並保存每種通貨輸入的數量
     list.forEach(item => {
         const input = document.getElementById(item[0]);
         if (input) {
@@ -193,33 +231,59 @@ function saveAndCalc() {
         }
     });
 
-    // 換算為 Divine 總量并修復精度 Bug
     const dTotal = dRate > 0 ? (cTotal / dRate) : 0;
-    
     document.getElementById('resDiv').innerText = dTotal.toFixed(2) + " Divine";
     document.getElementById('resChaos').innerText = uiText[lang].chaosUnit + Math.round(cTotal) + uiText[lang].chaosSuffix;
 }
 
-// 切換語言函數（無刷新，完美保留用戶輸入數值和匯率）
+// 5. 核心無刷新多語言切換
 function setLanguage(l) {
     lang = l;
-    localStorage.setItem('poe_calc_lang', l);
+    // 🟢 1. 統一修改為全局唯一的快取鍵名
+    localStorage.setItem('poe_global_lang', l); 
+    localStorage.setItem('poe_calc_lang', l); // 保持舊相容
     
-    // 1. 更新高亮樣式
+    // 🟢 2. 【核心修復】：在點擊切換時，向全局導航欄發射變字信號！
+    window.dispatchEvent(new Event('poe_lang_changed'));
+
     document.getElementById('btn_zh').className = "lang-btn" + (lang === 'zh' ? " active" : "");
     document.getElementById('btn_en').className = "lang-btn" + (lang === 'en' ? " active" : "");
     
-    // 2. 翻譯靜態文字
     const dict = uiText[lang];
     document.getElementById('page_title').innerText = dict.title;
     document.getElementById('ui_main_title').innerText = dict.mainTitle;
     document.getElementById('ui_rate_title').innerText = dict.rateTitle;
+	// 🟢 🆕 核心優化：點擊切換語言時，最上方的匯率微調面板前置文字也會即時無刷新變字
+    document.getElementById('lbl_div').innerText = lang === 'zh' ? "1 Divine = " : "1 Divine = ";
+    document.getElementById('lbl_ex').innerText = lang === 'zh' ? "1 崇高石 = " : "1 Exalted = ";
+    document.getElementById('lbl_frac').innerText = lang === 'zh' ? "1 破裂石 = " : "1 Fracturing = ";
+    document.getElementById('lbl_annul').innerText = lang === 'zh' ? "1 淨化石 = " : "1 Annulment = ";
+    document.getElementById('lbl_fuse').innerText = lang === 'zh' ? "1 連結石 = " : "1 Fusing = ";
+    document.getElementById('lbl_alt').innerText = lang === 'zh' ? "1 改造石 = " : "1 Alteration = ";
     document.getElementById('ui_net_worth').innerText = dict.netWorth;
     document.getElementById('ui_clear_btn').innerText = dict.clearBtn;
-    document.getElementById('ui_help_box').innerHTML = dict.helpHtml;
+	// 🟢 🆕 核心優化：切換語言時，實時更新微調面板標題與面板內部的路徑文本
+    document.getElementById('ui_rate_title').innerText = dict.rateTitle;
+    
+    const pathPanelEl = document.getElementById('path-panel');
+    if (pathPanelEl) pathPanelEl.innerHTML = dict.pathPanelHtml;
+    
+    document.getElementById('ui_help_box').innerHTML = dict.helpHtml();
+    
+    // 只動態修改拖拽提示文本，絕不衝擊 HTML 的按鈕結構
+    if(document.getElementById('log-result').style.display !== 'block') {
+        const txt = document.getElementById('ui_drop_text');
+        if (txt) txt.innerHTML = dict.dropTips;
+    }
 
+    // 🟢 🆕 同步優化：讓展開/摺疊按鈕的文字也完美適應中英文
+    const btn = document.getElementById('ui_path_btn');
+    if (btn) {
+        const isVisible = document.getElementById('path-panel').style.display === "block";
+        btn.innerText = isVisible ? dict.btnPathHide : dict.btnPathShow;
+    }
 
-    // 3. 實時動態局部變字，不摧毀勾選狀態和輸入框焦點
+    // 遍歷刷字（已校準最穩健的數組索引，防範崩潰）
     list.forEach(item => {
         const nameEl = document.getElementById(`n_${item[0]}`);
         const subEl = document.getElementById(`e_${item[0]}`);
@@ -227,33 +291,48 @@ function setLanguage(l) {
         if (subEl) subEl.innerText = (lang === 'zh' ? item[2] : item[1]);
     });
 
-    // 4. 同步更新總和看板的語意文字
     saveAndCalc();
 }
 
-// 網頁載入時自動讀取恢復資料
+// 6. 點擊按鈕一行內摺疊路徑
+function tglPath() {
+    const p = document.getElementById('path-panel');
+    const btn = document.getElementById('ui_path_btn');
+    const dict = uiText[lang];
+    if (p && btn) {
+        const v = p.style.display === "block";
+        p.style.display = v ? "none" : "block";
+        localStorage.setItem('poe_path_v', v ? "0" : "1");
+        btn.innerText = v ? dict.btnPathShow : dict.btnPathHide;
+    }
+}
+
+// 7. 網頁加載讀取恢復
 window.onload = function() {
-    // 1. 初始化網格
     renderGrid();
 
-    // 2. 恢復匯率快取
     const rates = ["div", "ex", "frac", "annul", "fuse", "alt"];
     rates.forEach(r => {
         const savedRate = localStorage.getItem("poe_r_" + r);
         if (savedRate !== null) document.getElementById("r_" + r).value = savedRate;
     });
 
-    // 3. 恢復通貨輸入框快取
     list.forEach(item => {
         const savedVal = localStorage.getItem("poe_val_" + item[0]);
         if (savedVal !== null) document.getElementById(item[0]).value = savedVal;
     });
 
-    // 4. 校準多語言狀態
+    // 優先從本地緩存恢復路徑顯示狀態，避免加載時閃爍
+    if (localStorage.getItem('poe_path_v') === "1") {
+        const p = document.getElementById('path-panel');
+        if (p) p.style.display = "block";
+    }
+
     setLanguage(lang);
+    initLogListener();
 }
 
-// 一鍵徹底清空快取與輸入
+// 8. 一鍵清空
 function cls() {
     list.forEach(item => { 
         const input = document.getElementById(item[0]);
@@ -263,6 +342,64 @@ function cls() {
         }
     });
     saveAndCalc();
+}
+
+// 9. 高性能日誌流式解析器
+function initLogListener() {
+    const zone = document.getElementById('log-drop-zone');
+    if (!zone) return;
+    zone.addEventListener('dragover', (e) => { e.preventDefault(); });
+    
+    zone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const file = e.dataTransfer.files;
+        const dict = uiText[lang];
+        
+        if (!file || file.name !== 'Client.txt') {
+            alert(dict.errLog);
+            return;
+        }
+
+        document.getElementById('ui_drop_text').innerText = dict.loadingLog;
+        
+        const reader = new FileReader();
+        const sliceSize = 50 * 1024 * 1024; 
+        const startByte = Math.max(0, file.size - sliceSize);
+        const blob = file.slice(startByte, file.size);
+
+        reader.onload = function(event) {
+            const lines = event.target.result.split('\n');
+            let runs = 0, totalTime = 0, lastStart = null;
+
+            lines.forEach(line => {
+                if (line.includes('Sanctum') || line.includes('聖所') || line.includes('圣所')) {
+                    const ts = line.match(/\[(.*?)\]/);
+                    if (ts && ts[1]) lastStart = new Date(ts[1].replace(/-/g, '/'));
+                }
+                if ((line.includes('Hideout') || line.includes('藏身處') || line.includes('藏身处')) && lastStart) {
+                    const ts = line.match(/\[(.*?)\]/);
+                    if (ts && ts[1]) {
+                        const duration = (new Date(ts[1].replace(/-/g, '/')) - lastStart) / 1000;
+                        if (duration > 30 && duration < 7200) { runs++; totalTime += duration; }
+                    }
+                    lastStart = null;
+                }
+            });
+
+            const resBox = document.getElementById('log-result');
+            if (runs === 0) {
+                resBox.innerHTML = dict.noRun;
+            } else {
+                const avg = totalTime / runs;
+                const totalD = (runs * 0.5).toFixed(1); 
+                const dph = ((totalD / (totalTime / 3600))).toFixed(1);
+                resBox.innerHTML = dict.logResHtml(runs, Math.floor(avg / 60), Math.round(avg % 60), totalD, dph);
+            }
+            resBox.style.display = 'block';
+            document.getElementById('ui_drop_text').innerHTML = lang === 'zh' ? '📋 清算完畢！拖拽新日誌可覆蓋刷新' : '📋 Scan Complete! Drop new file to overwrite.';
+        };
+        reader.readAsText(blob, 'utf-8');
+    });
 }
 </script>
 </body>

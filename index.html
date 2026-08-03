@@ -153,13 +153,18 @@ function renderTable() {
 // 切换语言函数
 function setLanguage(lang) {
     currentLang = lang;
-    localStorage.setItem('poe_currency_lang', lang);
+    // 1. 统一修改并写入全局唯一的快取键名
+    localStorage.setItem('poe_global_lang', lang);
+    localStorage.setItem('poe_currency_lang', lang); // 保持旧页面兼容
     
-    // 更新高亮样式
+    // 2. 🟢 向全局导航栏发射变字信号
+    window.dispatchEvent(new Event('poe_lang_changed'));
+    
+    // 3. 更新高亮样式
     document.getElementById('btn_zh').className = "lang-btn" + (lang === 'zh' ? " active" : "");
     document.getElementById('btn_en').className = "lang-btn" + (lang === 'en' ? " active" : "");
     
-    // 翻译界面文本
+    // 4. 【核心修复】：必须在函数内部重新获取字典并强制重绘页面文本，否则文本不会动
     const dict = uiText[lang];
     document.getElementById('page_title').innerText = dict.title;
     document.getElementById('ui_main_title').innerText = dict.mainTitle;
@@ -171,6 +176,9 @@ function setLanguage(lang) {
 
 // 初始化加载
 window.onload = function() {
+	// 请确保初始化读取的是全局公共语言键名
+	let currentLang = localStorage.getItem('poe_global_lang') || 'zh';
+
     renderTable();
     setLanguage(currentLang);
     

@@ -234,20 +234,29 @@ function run() {
     document.getElementById('res').value = arr.length > 0 ? arr.join('|') : '';
 }
 
-// 核心多語言無刷新實時文字切換更新
+// 🟢 終極修復：對齊全局事件總線的 regex 語言切換函數
 function setL(l) { 
     lang = l; 
-    localStorage.setItem('p_r_l', l); 
+    // 1. 統一寫入全局唯一的語言快取鍵名
+    localStorage.setItem('poe_global_lang', l); 
+    localStorage.setItem('p_r_l', l); // 保持舊版相容
     
+    // 2. 向全局導航欄發射變字訊號
+    window.dispatchEvent(new Event('poe_lang_changed'));
+    
+    // 3. 刷新頁面靜態 UI 文本與長說明文案
     render();
     
+    // 4. 實時無刷新變更列表內所有卡片的中英文名字，不丟失勾選狀態
     db.forEach(x => {
-        const nameEl = document.getElementById(`n_${x[0]}`);
-        const subEl = document.getElementById(`e_${x[0]}`);
-        if (nameEl) nameEl.innerText = (lang === 'zh' ? x[1] : x[2]);
-        if (subEl) subEl.innerText = (lang === 'zh' ? x[2] : x[1]);
+        const nameEl = document.getElementById(`n_${x}`);
+        const subEl = document.getElementById(`e_${x}`);
+        if (nameEl) nameEl.innerText = (lang === 'zh' ? x : x);
+        if (subEl) subEl.innerText = (lang === 'zh' ? x : x);
     });
-    run(); // 切換語言時同步整理一次正則字串
+    
+    // 5. 同步整理一次正則字串
+    run(); 
 }
 
 // 【核心修復】：重寫全自動面板切換函數，防止狀態打架
@@ -264,6 +273,7 @@ function tglG() {
 }
 
 window.onload = function() {
+	let lang = localStorage.getItem('poe_global_lang') || 'zh';
     renderGrid();
     
     if (localStorage.getItem('p_g_v') === "1") {
